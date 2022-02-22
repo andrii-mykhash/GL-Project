@@ -16,12 +16,14 @@ Client connets to server, recieve unocupied position of dot, "draw" and can chan
 
 ### Example:
 Field (4x10)
-<p>	+-----------+</p>
-<p>1	|  *  *-->* |</p>
-<p>2	|  ^        |</p>
-<p>3	|  |        |</p>
-<p>4	|  *        |</p>
-<p>	+-----------+</p>
+```
++-----------+
+|  *  *-->* |
+|  ^        |
+|  |        |
+|  *        |
++-----------+
+```
 
 
 
