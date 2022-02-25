@@ -1,19 +1,23 @@
+CXX_FLAGS = -g -Wall -Isrc/headers 
+SRC = src
+BUILD = build
+
 .Phony: all build clear
 
-build: mkdir src/field.cpp dot.o field.o
-	g++ -g -Wall src/test.cpp -o test build/dot.o build/field.o
-	mv test build/
+build: mkdir $(SRC)/field.cpp dot.o field.o
+	g++ $(CXX_FLAGS) $(SRC)/main.cpp -o main $(BUILD)/dot.o $(BUILD)/field.o
+	mv main build/
 
 mkdir: 
 	mkdir -p build
 
-dot.o: src/dot.cpp 
-	g++ -g -Wall -c src/dot.cpp
-	mv dot.o build/
+dot.o: $(SRC)/dot.cpp 
+	g++ $(CXX_FLAGS)  -c $(SRC)/dot.cpp
+	mv dot.o $(BUILD)/
 
-field.o: src/field.cpp dot.o
-	g++ -g -Wall -c src/field.cpp 
-	mv field.o build/
+field.o: $(SRC)/field.cpp dot.o
+	g++ $(CXX_FLAGS) -c $(SRC)/field.cpp 
+	mv field.o $(BUILD)/
 
 clear: 
-	rm -rf ./build
+	rm -rf ./$(BUILD)

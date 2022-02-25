@@ -3,26 +3,30 @@
 
 #include "dot.hpp"
 #include "user.hpp"
+
 #include <map>
+#include <unistd.h>
 #include <vector>
-// #include <string.h>
+#include <algorithm>
+#include <iostream>
+#include <random>
+#include <string>
 #include <mutex>
 
 
 class Field
 {
 private:   
-    // std::mutex mut;
-    std::map<char*, Dot> users;
+    std::map<std::string, Dot> users;
 public:
-    bool hasCollision(char* ip, Dot to_verify);
-    void createUser(char* ip);
-    std::map<Dot, char*> get();
-    void move(char*, Dot new_coords);
+    bool hasCollision(std::string ip, Dot to_verify);
+    void createUser(std::string ip);
+    void move(std::string, Dot new_coords);
     void remove(User);
     // to remove
+    void draw(int&);
     void add();
-    Dot gets(char*);
+    Dot gets(std::string);
 };
 
 #endif

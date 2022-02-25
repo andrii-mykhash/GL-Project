@@ -1,21 +1,23 @@
 #include "headers/field.hpp"
-#include <algorithm>
-#include <stdio.h>
-#include <string.h>
-#include <iostream>
-#include <random>
 
-void Field::createUser(char *ip)
+
+// #include <fcntl.h>
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <termios.h>
+// #include <string.h>
+
+
+void Field::createUser(std::string ip)
 {
     std::random_device r;
 
     std::default_random_engine e1(r());
     std::uniform_int_distribution<int> x(0, 80);
     std::uniform_int_distribution<int> y(0, 24);
-    // srand(time(NULL));
     Dot coords;
+
     bool isnt_done = true;
-    // strcpy(to_return.ip, ip);
     while (isnt_done)
     {
         coords.x = x(e1);
@@ -28,19 +30,17 @@ void Field::createUser(char *ip)
     users[ip] = coords;
 }
 
-
-bool Field::hasCollision(char* ip, Dot to_verify)
+bool Field::hasCollision(std::string ip, Dot to_verify)
 {
-    for(auto it = users.begin(); it != users.end(); it++)
+    for (auto it = users.begin(); it != users.end(); it++)
     {
-        if(it->second == to_verify && strcmp(it->first, ip) != 0)
+        if (it->second == to_verify && ip.compare(it->first) != 0)
         {
             return true;
         }
     }
     return false;
 }
-
 
 void Field::add()
 {
@@ -50,14 +50,59 @@ void Field::add()
     }
 }
 
-void Field::move(char* ip_to_move, Dot new_coords)
+void Field::draw(int& tty)
 {
-    if(!hasCollision(ip_to_move,new_coords))
+    char paint[80][24] = {'\0'};
+    for (auto it = users.cbegin(); it != users.cend(); ++it)
+    {
+        paint[it->second.x][it->second.y] = '*';  
+    }
+
+    write(tty,"+", sizeof(char));
+    for(int i = 0; i < 80; i++)
+    {
+        write(tty,"-", sizeof(char));
+    }
+    write(tty,"+\n", 2*sizeof(char));
+
+    for(int y = 0; y < 24; y++){
+        write(tty,"|", sizeof(char));
+
+        for(int x = 0; x < 80; x ++)
+        {
+            if (paint[x][y] == '\0')
+            {
+                write(tty," ", sizeof(char));
+            }else{
+                write(tty,&paint[x][y], sizeof(char));
+            }
+        }
+        write(tty,"|\n", 2*sizeof(char));
+    }
+
+    write(tty,"+", sizeof(char));
+
+    for(int i = 0; i < 80; i++)
+    {
+        write(tty,"-", sizeof(char));
+    }
+    write(tty,"+\n", 2*sizeof(char));
+}
+
+void Field::move(std::string ip_to_move, Dot new_coords)
+{
+    if (!hasCollision(ip_to_move, new_coords))
     {
         users[ip_to_move] = new_coords;
     }
 }
-Dot Field::gets(char* ip)
+
+Dot Field::gets(std::string ip)
 {
     return users[ip];
+}
+
+void Field::remove(User u)
+{
+    users.erase(u.ip);
 }

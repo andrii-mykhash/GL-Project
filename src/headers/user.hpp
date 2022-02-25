@@ -1,16 +1,13 @@
 #ifndef GL_USER
 #define GL_USER
+
 #include "dot.hpp"
-#include <string.h>
+#include <string>
 
 struct User
 {
-    char* ip;
+    std::string ip;
     Dot coords;
-    
-    // bool operator==(const User& rhs)
-    // {
-    //     return this->coords == rhs.coords && strcmp
-    // }
 };
+
 #endif
