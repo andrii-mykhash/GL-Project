@@ -1,16 +1,12 @@
 #ifndef GL_FIELD
 #define GL_FIELD
 
-#include "dot.hpp"
-#include "user.hpp"
+#include "../inc/dot.h"
+#include "../inc/user.h"
 
 #include <map>
-#include <unistd.h>
-#include <vector>
-#include <algorithm>
-#include <iostream>
-#include <random>
 #include <string>
+#include <random>
 #include <mutex>
 
 
