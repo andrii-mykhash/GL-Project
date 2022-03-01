@@ -1,7 +1,7 @@
 #ifndef GL_USER
 #define GL_USER
 
-#include "dot.hpp"
+#include "dot.h"
 #include <string>
 
 struct User

@@ -10,12 +10,11 @@
 // #include <termios.h>
 // #include <string.h>
 
-
 void Field::createUser(std::string ip)
 {
-    std::random_device r;
+    std::random_device rand_device;
 
-    std::default_random_engine e1(r());
+    std::default_random_engine e1(rand_device());
     std::uniform_int_distribution<int> x(0, 80);
     std::uniform_int_distribution<int> y(0, 24);
     Dot coords;
@@ -33,7 +32,7 @@ void Field::createUser(std::string ip)
     users[ip] = coords;
 }
 
-bool Field::hasCollision(std::string ip, Dot to_verify)
+bool Field::hasCollision(std::string ip, Dot to_verify) const
 {
     for (auto it = users.begin(); it != users.end(); it++)
     {
@@ -45,7 +44,7 @@ bool Field::hasCollision(std::string ip, Dot to_verify)
     return false;
 }
 
-void Field::add()
+void Field::showAllUsers() const
 {
     for (auto it = users.cbegin(); it != users.cend(); ++it)
     {
@@ -53,7 +52,7 @@ void Field::add()
     }
 }
 
-void Field::draw(int& tty)
+void Field::draw(int& fd_tty) const
 {
     char paint[80][24] = {'\0'};
     for (auto it = users.cbegin(); it != users.cend(); ++it)
@@ -61,35 +60,35 @@ void Field::draw(int& tty)
         paint[it->second.x][it->second.y] = '*';  
     }
 
-    write(tty,"+", sizeof(char));
+    write(fd_tty,"+", sizeof(char));
     for(int i = 0; i < 80; i++)
     {
-        write(tty,"-", sizeof(char));
+        write(fd_tty,"-", sizeof(char));
     }
-    write(tty,"+\n", 2*sizeof(char));
+    write(fd_tty,"+\n", 2*sizeof(char));
 
     for(int y = 0; y < 24; y++){
-        write(tty,"|", sizeof(char));
+        write(fd_tty,"|", sizeof(char));
 
         for(int x = 0; x < 80; x ++)
         {
             if (paint[x][y] == '\0')
             {
-                write(tty," ", sizeof(char));
+                write(fd_tty," ", sizeof(char));
             }else{
-                write(tty,&paint[x][y], sizeof(char));
+                write(fd_tty,&paint[x][y], sizeof(char));
             }
         }
-        write(tty,"|\n", 2*sizeof(char));
+        write(fd_tty,"|\n", 2*sizeof(char));
     }
 
-    write(tty,"+", sizeof(char));
+    write(fd_tty,"+", sizeof(char));
 
     for(int i = 0; i < 80; i++)
     {
-        write(tty,"-", sizeof(char));
+        write(fd_tty,"-", sizeof(char));
     }
-    write(tty,"+\n", 2*sizeof(char));
+    write(fd_tty,"+\n", 2*sizeof(char));
 }
 
 void Field::move(std::string ip_to_move, Dot new_coords)
@@ -100,7 +99,7 @@ void Field::move(std::string ip_to_move, Dot new_coords)
     }
 }
 
-Dot Field::gets(std::string ip)
+Dot Field::getCoords(std::string ip)
 {
     return users[ip];
 }

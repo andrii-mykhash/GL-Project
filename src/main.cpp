@@ -1,5 +1,5 @@
 #include <iostream>
-#include "headers/field.hpp"
+#include "../inc/field.h"
 
 #include <fcntl.h>
 #include <stdio.h>
@@ -44,12 +44,12 @@ int main()
     f.createUser("8.172.5.15");
     f.createUser("10.10.11.12");
     f.createUser("1.16.3.11");
-    f.add();
+    f.showAllUsers();
 
     while (true)
     {
         f.draw(tty);
-        Dot ddd = f.gets("10.10.11.12");
+        Dot ddd = f.getCoords("10.10.11.12");
         format_out = ddd.x + " " + ddd.y;
         write(tty,format_out.c_str(),(sizeof(char)*format_out.size()));
         // std::cout << "\n" << ddd.x << "x" << ddd.y << std::endl;

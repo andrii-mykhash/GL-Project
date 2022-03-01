@@ -1,4 +1,4 @@
-#include "headers/dot.hpp"
+#include "../inc/dot.h"
 
 bool operator==(const Dot& lhs, const Dot& rhs)
 {

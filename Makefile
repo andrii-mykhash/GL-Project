@@ -1,4 +1,4 @@
-CXX_FLAGS = -g -Wall -Isrc/headers 
+CXX_FLAGS = -std=c++2a -g -Wall -Iinc 
 SRC = src
 BUILD = build
 
