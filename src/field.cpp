@@ -4,11 +4,6 @@
 #include <algorithm>
 #include <iostream>
 
-// #include <fcntl.h>
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <termios.h>
-// #include <string.h>
 
 void Field::createUser(std::string ip)
 {
@@ -38,7 +33,7 @@ void Field::createUser(std::string ip)
 bool Field::hasCollision(std::string ip, Dot to_verify) const
 {
     /*
-        Check if given position has collision in 'users' collecion 
+        Check if given position has collision in 'users' collecion
     */
     for (auto it = users.begin(); it != users.end(); it++)
     {
@@ -61,15 +56,17 @@ void Field::showAllUsers() const
     }
 }
 
-void Field::draw(int& fd_tty) const
+void Field::draw(std::fstream *tty)
 {
     /*
-        Output field that have got 80x24 dimention and contain all curent users 
+        Output field that have got 80x24 dimention and contain all curent users
     */
+
+    tty->flush();
     char paint[80][24] = {'\0'};
     for (auto it = users.cbegin(); it != users.cend(); ++it)
     {
-        paint[it->second.x][it->second.y] = '*';  
+        paint[it->second.x][it->second.y] = '*';
     }
 
     // Draw grid
@@ -77,35 +74,40 @@ void Field::draw(int& fd_tty) const
     // |    |
     // |    |
     // +----+
-    write(fd_tty,"+", sizeof(char));
-    for(int i = 0; i < 80; i++)
+
+    *tty << "+";
+    for (int i = 0; i < 80; i++)
     {
-        write(fd_tty,"-", sizeof(char));
+        *tty << "-";
     }
-    write(fd_tty,"+\n", 2*sizeof(char));
+    *tty << "+\n";
 
-    for(int y = 0; y < 24; y++){
-        write(fd_tty,"|", sizeof(char));
-
-        for(int x = 0; x < 80; x ++)
+    for (int y = 0; y < 24; y++)
+    {
+        *tty << "|";
+        for (int x = 0; x < 80; x++)
         {
             if (paint[x][y] == '\0')
             {
-                write(fd_tty," ", sizeof(char));
-            }else{
-                write(fd_tty,&paint[x][y], sizeof(char));
+                *tty << " ";
+            }
+            else
+            {
+                *tty << paint[x][y];
             }
         }
-        write(fd_tty,"|\n", 2*sizeof(char));
+        *tty << "|\n";
     }
 
-    write(fd_tty,"+", sizeof(char));
-
-    for(int i = 0; i < 80; i++)
+    *tty << "+";
+    for (int i = 0; i < 80; i++)
     {
-        write(fd_tty,"-", sizeof(char));
+        *tty << "-";
     }
-    write(fd_tty,"+\n", 2*sizeof(char));
+    *tty << "+\n";
+    tty->flush();
+
+    // write(fd_tty,"+\n", 2*sizeof(char));
 }
 
 void Field::move(std::string ip_to_move, Dot new_coords)

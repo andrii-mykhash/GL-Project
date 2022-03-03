@@ -7,6 +7,7 @@
 #include <map>
 #include <string>
 #include <random>
+#include <fstream>
 // #include <mutex>
 
 //TODO: "ip" change to "id"
@@ -23,7 +24,7 @@ public:
     Dot getCoords(std::string ip);
 
     // to remove
-    void draw(int& fd_tty) const;
+    void draw(std::fstream* tty);
     void showAllUsers() const;
 };
 
