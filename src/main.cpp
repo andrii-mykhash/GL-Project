@@ -10,6 +10,9 @@
 
 int setup_tty_terminal()
 {
+    /*
+        Setup app to output directly to terminal/tty
+    */
     int terminal = open("/dev/tty", O_RDWR | O_NOCTTY);
 
     struct termios tty;
