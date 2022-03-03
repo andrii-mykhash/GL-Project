@@ -10,9 +10,7 @@ void Field::createUser(std::string ip)
     /*
         Create new user with random Dot position
     */
-    std::random_device rand_device;
-
-    std::default_random_engine e1(rand_device());
+    std::default_random_engine e1(this->rand_device());
     std::uniform_int_distribution<int> x(0, 80);
     std::uniform_int_distribution<int> y(0, 24);
     Dot coords;
@@ -106,8 +104,6 @@ void Field::draw(std::fstream *tty)
     }
     *tty << "+\n";
     tty->flush();
-
-    // write(fd_tty,"+\n", 2*sizeof(char));
 }
 
 void Field::move(std::string ip_to_move, Dot new_coords)

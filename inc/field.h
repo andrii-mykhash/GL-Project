@@ -14,7 +14,7 @@
 class Field
 {
 private:   
-    static std::random_device rand_device;
+    std::random_device rand_device;
     std::map<std::string, Dot> users;
 public:
     bool hasCollision(std::string ip, Dot to_verify) const;
