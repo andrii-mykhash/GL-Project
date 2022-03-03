@@ -10,22 +10,24 @@
 #include <fstream>
 // #include <mutex>
 
-//TODO: "ip" change to "id"
 class Field
 {
-private:   
+private:
+    static int id_count;
     std::random_device rand_device;
-    std::map<std::string, Dot> users;
+    std::map<int, User> users;
 public:
-    bool hasCollision(std::string ip, Dot to_verify) const;
-    void createUser(std::string ip);
-    void move(std::string ip, Dot new_coords);
+    bool hasCollision(User& to_verify) const;
+    int createUser(std::string ip);
+    void move(User& to_move);
     void remove(User to_remove);
-    Dot getCoords(std::string ip);
+    Dot getCoords(int& id);
+    User getUser(int& id);
 
     // to remove
     void draw(std::fstream* tty);
     void showAllUsers() const;
 };
+
 
 #endif

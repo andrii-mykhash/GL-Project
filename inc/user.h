@@ -6,6 +6,7 @@
 
 struct User
 {
+    int uid;
     std::string ip;
     Dot coords;
 };

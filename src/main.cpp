@@ -23,20 +23,25 @@ int main()
     
     f.createUser("192.168.0.11");
     f.createUser("8.172.5.15");
-    f.createUser("10.10.11.12");
+    User temp_user;
+    temp_user.uid = f.createUser("10.10.11.12");
     f.createUser("1.16.3.11");
     f.showAllUsers();
-
+    
     while (true)
     {
+
         f.draw(tty);
-        Dot ddd = f.getCoords("10.10.11.12");
+        Dot ddd = f.getCoords(temp_user.uid);
         format_out = ddd.x + " " + ddd.y;
         *tty << "\n" << ddd.x << "x" << ddd.y << std::endl;
-        int x, y;
-        
-        std::cin >> x >> y;
-        f.move("10.10.11.12",{x,y});
+        // int x, y;
+        if(!std::cin.good())
+        {
+            break;
+        }
+        std::cin >> temp_user.coords.x >> temp_user.coords.y;
+        f.move(temp_user);
 
         *tty << "\033c";
     }
