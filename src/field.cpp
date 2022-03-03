@@ -41,7 +41,7 @@ bool Field::hasCollision(User& to_verify) const
 
     for (auto it = users.begin(); it != users.end(); it++)
     {
-        if (it->second.coords == to_verify.coords && to_verify.uid == it->first)
+        if (it->second.coords == to_verify.coords && to_verify.uid != it->first)
         {
             return true;
         }
