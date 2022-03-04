@@ -123,16 +123,7 @@ void Field::move(User& to_move)
     }
 }
 
-Dot Field::getCoords(int& id)
-{
-    /*
-        Return current user coordinates
-    */
-    return users[id].coords;
-}
-
-
-User Field::getUser(int& id)
+User Field::getUser(int id)
 {
     /*
         Return user by id

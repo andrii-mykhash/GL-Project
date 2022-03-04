@@ -32,10 +32,9 @@ int main()
     {
 
         f.draw(tty.get());
-        Dot ddd = f.getCoords(temp_user.uid);
+        Dot ddd = f.getUser(temp_user.uid).coords;
         format_out = ddd.x + " " + ddd.y;
         *tty << "\n" << ddd.x << "x" << ddd.y << std::endl;
-        // int x, y;
         if(!std::cin.good())
         {
             break;
