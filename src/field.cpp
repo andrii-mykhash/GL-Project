@@ -12,8 +12,8 @@ int Field::createUser(std::string ip)
         Create new user with random Dot position, return user_id (uid)
     */
     std::default_random_engine e1(this->rand_device());
-    std::uniform_int_distribution<int> x(0, 80);
-    std::uniform_int_distribution<int> y(0, 24);
+    std::uniform_int_distribution<int> x(0, Field::WIDTH);
+    std::uniform_int_distribution<int> y(0, Field::HEIGHT);
     User temp_user;
     temp_user.uid = Field::id_count;
 

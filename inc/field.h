@@ -13,6 +13,8 @@
 class Field
 {
 private:
+    static const int WIDTH = 80;
+    static const int HEIGHT = 80;
     static int id_count;
     std::random_device rand_device;
     std::map<int, User> users;
