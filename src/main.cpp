@@ -4,13 +4,13 @@
 #include <string.h>
 #include <fstream>
 #include <iostream>
-
+#include <memory>
 #include <unistd.h>
 
 
 int main()
 {
-    std::fstream* tty = new std::fstream("/dev/tty", tty->in | tty->out | tty->trunc);
+    std::unique_ptr<std::fstream> tty = std::make_unique<std::fstream>("/dev/tty", tty->in | tty->out | tty->trunc);
     if(!tty->is_open())
     {
         std::cerr << "tty open error" << std::endl;
@@ -31,7 +31,7 @@ int main()
     while (true)
     {
 
-        f.draw(tty);
+        f.draw(tty.get());
         Dot ddd = f.getCoords(temp_user.uid);
         format_out = ddd.x + " " + ddd.y;
         *tty << "\n" << ddd.x << "x" << ddd.y << std::endl;
@@ -46,6 +46,5 @@ int main()
         *tty << "\033c";
     }
 
-    delete tty;
     return 0;
 }
