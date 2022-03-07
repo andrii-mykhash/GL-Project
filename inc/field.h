@@ -21,7 +21,7 @@ private:
 public:
     bool hasCollision(User& to_verify) const;
     int createUser(std::string ip);
-    void move(User& to_move);
+    int move(User& to_move);
     void remove(User to_remove);
     // User getUser(int id);
     int getUser(int id, User& to_return);

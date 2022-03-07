@@ -112,7 +112,7 @@ void Field::draw(std::fstream *tty)
     tty->flush();
 }
 
-void Field::move(User& to_move)
+int Field::move(User& to_move)
 {
     /*
         Change position in current user
@@ -120,7 +120,9 @@ void Field::move(User& to_move)
     if (!hasCollision(to_move))
     {
         users[to_move.uid] = to_move;
+        return 0;
     }
+    return 1;
 }
 
 int Field::getUser(int id, User& to_return)
