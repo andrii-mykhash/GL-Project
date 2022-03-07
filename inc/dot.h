@@ -1,13 +1,13 @@
 #ifndef GL_DOT
 #define GL_DOT
 
+#include <compare>
+
 struct Dot
 {
     int x;
     int y;
-    // auto operator<=> (const Dot& to_verify) const;
-    bool operator< (const Dot& to_verify) const;
-    bool operator== (const Dot& to_verify) const;
+    std::weak_ordering operator<=>(const Dot &to_verify) const;
 };
-    
+
 #endif

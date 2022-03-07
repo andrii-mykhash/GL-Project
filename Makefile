@@ -1,4 +1,4 @@
-CXX_FLAGS = -std=c++2a -g -Wall -Iinc 
+CXX_FLAGS = -std=c++20 -g -Wall -Iinc 
 SRC = src
 BUILD = build
 CC = g++-10

@@ -1,24 +1,10 @@
 #include "../inc/dot.h"
 
-bool operator==(const Dot& lhs, const Dot& rhs)
+std::weak_ordering Dot::operator<=>(const Dot &to_verify) const
 {
-    int lhs_temp, rhs_temp;
-    lhs_temp = lhs.x*100 + lhs.y;
-    rhs_temp = rhs.x*100 + rhs.y;
-    return lhs_temp == rhs_temp;
-}
+  int lhs_temp, rhs_temp;
+  lhs_temp = this->x * 100 + this->y;
+  rhs_temp = to_verify.x * 100 + to_verify.y;
 
-bool Dot::operator<(const Dot& rhs) const
-{
-    int lhs_temp, rhs_temp;
-    lhs_temp = this->x*100 + rhs.y;
-    rhs_temp = this->x*100 + rhs.y;
-    return lhs_temp < rhs_temp;
-}
-bool Dot::operator==(const Dot& rhs) const
-{
-    int lhs_temp, rhs_temp;
-    lhs_temp = this->x*100 + this->y;
-    rhs_temp = rhs.x*100 + rhs.y;
-    return lhs_temp == rhs_temp;
+  return lhs_temp <=> rhs_temp;
 }

@@ -30,11 +30,15 @@ int main()
     
     while (true)
     {
-
+        
         f.draw(tty.get());
-        Dot ddd = f.getUser(temp_user.uid).coords;
-        format_out = ddd.x + " " + ddd.y;
-        *tty << "\n" << ddd.x << "x" << ddd.y << std::endl;
+        if(f.getUser(temp_user.uid, temp_user) < 0)
+        {
+            continue;
+        }
+        format_out = temp_user.coords.x + " " + temp_user.coords.y;
+        *tty << "\n - Current pos: " << temp_user.coords.x << "x" << temp_user.coords.y << "\nx/y: ";
+        tty->flush();
         if(!std::cin.good())
         {
             break;

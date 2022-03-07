@@ -23,8 +23,8 @@ public:
     int createUser(std::string ip);
     void move(User& to_move);
     void remove(User to_remove);
-    // Dot getCoords(int& id);
-    User getUser(int id);
+    // User getUser(int id);
+    int getUser(int id, User& to_return);
 
     // to remove
     void draw(std::fstream* tty);

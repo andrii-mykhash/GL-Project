@@ -41,7 +41,7 @@ bool Field::hasCollision(User& to_verify) const
 
     for (auto it = users.begin(); it != users.end(); it++)
     {
-        if (it->second.coords == to_verify.coords && to_verify.uid != it->first)
+        if ((it->second.coords <=> to_verify.coords) == 0 && to_verify.uid != it->first)
         {
             return true;
         }
@@ -123,12 +123,17 @@ void Field::move(User& to_move)
     }
 }
 
-User Field::getUser(int id)
+int Field::getUser(int id, User& to_return)
 {
     /*
         Return user by id
     */
-    return users[id];
+   try{
+        to_return = users.at(id);
+    }catch(...){
+        return -1;
+    }
+    return 0;
 }
 
 void Field::remove(User u)
