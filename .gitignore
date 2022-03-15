@@ -2,3 +2,9 @@ build/
 .vscode/
 log.cpp
 tty_main*
+client
+src/client
+src/server
+server
+tmp.cpp
+tmp
