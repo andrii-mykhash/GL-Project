@@ -1,5 +1,5 @@
-#ifndef GL_USER
-#define GL_USER
+#ifndef GL_USER_H
+#define GL_USER_H
 
 #include "dot.h"
 #include <string>

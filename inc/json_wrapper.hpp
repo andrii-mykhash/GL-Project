@@ -1,5 +1,5 @@
-#ifndef GL_JSON_PARSER
-#define GL_JSON_PARSER
+#ifndef GL_JSON_PARSER_HPP
+#define GL_JSON_PARSER_HPP
 #include "user.h"
 #include <map>
 #include "json.hpp"

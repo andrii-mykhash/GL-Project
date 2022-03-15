@@ -1,5 +1,5 @@
-#ifndef GL_DOT
-#define GL_DOT
+#ifndef GL_DOT_H
+#define GL_DOT_H
 
 #include <compare>
 
