@@ -1,8 +1,8 @@
-#ifndef GL_FIELD
-#define GL_FIELD
+#ifndef GL_FIELD_H
+#define GL_FIELD_H
 
 #include "dot.h"
-#include "user.h"
+#include "user.hpp"
 
 #include <map>
 #include <string>

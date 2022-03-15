@@ -9,10 +9,11 @@
 
 #include "dot_test.h"
 #include "field_test.h"
+#include "json_wrapper_test.h"
 
 CPPUNIT_TEST_SUITE_REGISTRATION( DotTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( FieldTest );
-// CPPUNIT_TEST_SUITE_REGISTRATION( DotTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( JsonWrapperTest );
 
 int main()
 {

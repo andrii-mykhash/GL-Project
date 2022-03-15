@@ -1,18 +1,16 @@
 #ifndef GL_JSON_PARSER_HPP
 #define GL_JSON_PARSER_HPP
-#include "user.h"
+#include "user.hpp"
 #include <map>
 #include "json.hpp"
 #include <vector> 
 
-using nlohmann::json;
-
-void to_json(json &j, const User &u)
+void to_json(nlohmann::json &j, const User &u)
 {
     /*
         Used by json.hpp as serializer
     */
-    j = json{
+    j = nlohmann::json{
         {"uid", u.uid},
         {"ip", u.ip},
         {"coords",
@@ -20,7 +18,7 @@ void to_json(json &j, const User &u)
           {"y", u.coords.y}}}};
 }
 
-void from_json(const json &j, User &u)
+void from_json(const nlohmann::json &j, User &u)
 {
     /*
         Used by json.hpp as DEserializer
@@ -42,7 +40,7 @@ std::vector<std::uint8_t> map_to_cbor_json(std::map<int,User> users)
     for (auto const & pair : users) {
         temp.emplace(std::to_string(pair.first), pair.second);
     }
-    json serialize = temp;
+    nlohmann::json serialize = temp;
     return  nlohmann::json::to_cbor(serialize);
 }
 
@@ -51,7 +49,7 @@ std::map<int,User> json_cbor_to_map(std::vector<std::uint8_t> cbor)
     /*
         Convert from binary array to map<int id, User>
     */
-    json deserialize = nlohmann::json::from_cbor(cbor);
+    nlohmann::json deserialize = nlohmann::json::from_cbor(cbor);
     std::map<std::string, User> temp = deserialize;
     std::map<int, User> output;
     std::stringstream ss;

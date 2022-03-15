@@ -1,11 +1,10 @@
-#ifndef GL_FIELD_TEST_H
-#define GL_FIELD_TEST_H
+#ifndef GL_JSON_WRAPPER_TEST_H
+#define GL_JSON_WRAPPER_TEST_H
 
-#include "../inc/user.h"
+#include "../inc/user.hpp"
 #include <cppunit/TestCase.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestFixture.h>
-
 
 class JsonWrapperTest : public CppUnit::TestFixture
 {
@@ -25,7 +24,7 @@ public:
 
 private:
     std::map<int,User> test_map;
-    std::vector<std::uint8_t> test_json_bin;
+    std::vector<std::uint8_t> predefined_cbor;
 };
 
 #endif
