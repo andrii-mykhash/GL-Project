@@ -2,14 +2,19 @@
 #include <stdio.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <cstring> //memset
+#include <cstring>
 #include <errno.h>
 
-// #include <bo
+#include <map>
+#include <iostream>
+#include "../inc/user.hpp"
+#include "../inc/json_wrapper.hpp"
+
 const int PORT = 8088;
 
 int main()
 {
+    //-----------------------connecting stage------------------------
     char buffer[8];
     char *ip_str = (char *)malloc(16);
     printf("Write IP to connect: ");
@@ -39,40 +44,71 @@ int main()
         exit(-3);
     }
 
-    unsigned char coords_buff[2] = {0};
-    int x, y;
+    //-----------------------sharing data stage------------------------
+
+    // create containers
+    unsigned char x_y_buff[2] = {0};
+    int ret = 0;
+    int x_cin, y_cin;
+
+    std::map<int, User> users;
+    std::vector<std::uint8_t> cbor_data;
 
     while (1)
     {
         memset(&buffer, 0, 8 * sizeof(char));
         scanf("%s", buffer);
         send(sock, buffer, 8 * sizeof(char), 0);
-        if (strcmp(buffer, "q") == 0 || strcmp(buffer,"exit") == 0)
+
+        // exit
+        if (strcmp(buffer, "q") == 0 || 
+            strcmp(buffer, "exit") == 0)
         {
             break;
         }
-        scanf("%d", &x);
-        scanf("%d", &y);
 
-        coords_buff[0] = static_cast<unsigned char>(x);
-        coords_buff[1] = static_cast<unsigned char>(y);
+        //  getiing map
+        if (strcmp(buffer, "map\0") == 0)
+        {
+            cbor_data.clear();
+            size_t buffer_size = 0;
 
-        printf("x=%d, y=%d\n", (int)coords_buff[0], (int)coords_buff[1]);
+            ret = recv(sock, &buffer_size, sizeof(size_t), 0);
 
-        send(sock, coords_buff, 2 * sizeof(unsigned char), 0);
+            cbor_data.resize(buffer_size);
 
-        memset(coords_buff, 0, 2 * sizeof(unsigned char));
-        recv(sock, coords_buff, 2 * sizeof(unsigned char), 0);
-        printf("rec_x=%d, rec_y=%d\n", (int)coords_buff[0], (int)coords_buff[1]);
+            printf("ret=%d, buffer_size=%lu",
+                   ret, buffer_size);
+//, vector_size=%lu
+            ret = recv(sock, &cbor_data[0], buffer_size, 0);
+            users = json_cbor_to_map(cbor_data);
+            for (auto it = users.cbegin(); it != users.cend(); ++it)
+            {
+                std::cout << it->second.coords.x << "x"
+                          << it->second.coords.y << ":\t" << it->second.ip << "\n";
+            }
+        }
+
+        // moving dot
+        if (strcmp(buffer, "move\0") == 0)
+        {
+            scanf("%d", &x_cin);
+            scanf("%d", &y_cin);
+
+            x_y_buff[0] = static_cast<unsigned char>(x_cin);
+            x_y_buff[1] = static_cast<unsigned char>(y_cin);
+
+            printf("x=%d, y=%d\n", (int)x_y_buff[0], (int)x_y_buff[1]);
+
+            send(sock, x_y_buff, 2 * sizeof(unsigned char), 0);
+
+            memset(x_y_buff, 0, 2 * sizeof(unsigned char));
+            recv(sock, x_y_buff, 2 * sizeof(unsigned char), 0);
+            printf("rec_x=%d, rec_y=%d\n", (int)x_y_buff[0], (int)x_y_buff[1]);
+        }
     }
 
-    // scanf("%s", buffer);
-    // strcpy(buffer,"move\0");
-    // send(sock,buffer,32*sizeof(char),0);
-
-    // memset(&buffer, 0, 32*sizeof(char));
-    // recv(sock,buffer,32*sizeof(char),0);
-    // printf("recv=%s",buffer);
+    //-----------------------cleaning stage------------------------
 
     if (shutdown(sock, SHUT_RDWR) != 0)
     {

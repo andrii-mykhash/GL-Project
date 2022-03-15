@@ -4,7 +4,7 @@
 #include <map>
 #include "json.hpp"
 #include <vector> 
-
+#include <iostream>
 void to_json(nlohmann::json &j, const User &u)
 {
     /*
@@ -49,7 +49,16 @@ std::map<int,User> json_cbor_to_map(std::vector<std::uint8_t> cbor)
     /*
         Convert from binary array to map<int id, User>
     */
-    nlohmann::json deserialize = nlohmann::json::from_cbor(cbor);
+    nlohmann::json deserialize;
+    try{
+        deserialize = nlohmann::json::from_cbor(cbor);
+        
+    }catch(nlohmann::json::parse_error& e)
+    {
+        std::cout << e.what() << " id-"<<  e.id << " byte-" << e.byte << std::endl;
+        cbor.push_back(0);
+        deserialize = nlohmann::json::from_cbor(cbor);
+    }
     std::map<std::string, User> temp = deserialize;
     std::map<int, User> output;
     std::stringstream ss;

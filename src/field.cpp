@@ -15,6 +15,7 @@ int Field::createUser(std::string ip)
     std::uniform_int_distribution<int> x(0, Field::WIDTH);
     std::uniform_int_distribution<int> y(0, Field::HEIGHT);
     User temp_user;
+    temp_user.ip = ip;
     temp_user.uid = Field::id_count;
 
     bool isnt_done = true;
@@ -144,4 +145,9 @@ void Field::remove(User u)
         Delete user from collection
     */
     users.erase(u.uid);
+}
+
+std::map<int, User> Field::getMap()
+{
+    return users;
 }

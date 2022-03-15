@@ -4,7 +4,9 @@ BUILD = build
 TEST = test
 CC = g++-10
 
-.Phony: all build clear test
+.Phony: all build clear test sc
+
+all: build test sc
 
 #------------ Build -----------
 
@@ -22,6 +24,18 @@ dot.o: $(SRC)/dot.cpp
 field.o: $(SRC)/field.cpp dot.o
 	$(CC) $(CXX_FLAGS) -c $(SRC)/field.cpp 
 	mv field.o $(BUILD)/
+
+#-----------ServerClient------
+
+server: field.o $(SRC)/server.cpp
+	$(CC) $(CXX_FLAGS) $(SRC)/server.cpp -o server $(BUILD)/dot.o $(BUILD)/field.o
+	mv server $(BUILD)/
+
+client: field.o $(SRC)/client.cpp
+	$(CC) $(CXX_FLAGS) $(SRC)/client.cpp -o client $(BUILD)/dot.o $(BUILD)/field.o
+	mv client $(BUILD)/
+
+sc: field.o client server
 
 #------------ Test -----------
  
