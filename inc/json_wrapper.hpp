@@ -30,7 +30,7 @@ void from_json(const nlohmann::json &j, User &u)
 }
 
 
-std::vector<std::uint8_t> map_to_cbor_json(std::map<int,User> users)
+std::vector<std::uint8_t> map_to_json(std::map<int,User> users)
 {
     /*
         Convert from map<int id, User> to binary array
@@ -44,20 +44,16 @@ std::vector<std::uint8_t> map_to_cbor_json(std::map<int,User> users)
     return  nlohmann::json::to_cbor(serialize);
 }
 
-std::map<int,User> json_cbor_to_map(std::vector<std::uint8_t> cbor)
+std::map<int,User> json_to_map(std::vector<std::uint8_t> bin_json)
 {
     /*
         Convert from binary array to map<int id, User>
     */
     nlohmann::json deserialize;
     try{
-        deserialize = nlohmann::json::from_cbor(cbor);
-        
-    }catch(nlohmann::json::parse_error& e)
-    {
-        std::cout << e.what() << " id-"<<  e.id << " byte-" << e.byte << std::endl;
-        cbor.push_back(0);
-        deserialize = nlohmann::json::from_cbor(cbor);
+        deserialize = nlohmann::json::from_cbor(bin_json.begin(),bin_json.end(),false,true);
+    }catch(nlohmann::json::parse_error& e){
+        std::cout << e.what() << "\nid-"<<  e.id << "\nbyte-" << e.byte << std::endl;
     }
     std::map<std::string, User> temp = deserialize;
     std::map<int, User> output;

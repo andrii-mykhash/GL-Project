@@ -94,20 +94,29 @@ int main()
 
 				sendto(remote_sock, coord_buffer, 2 * sizeof(unsigned char),
 					   0, (sockaddr *)&remote_sock_addr, length);
+				// field.move()
 			}
 		}
 		if (strcmp(command_buffer, "map\0") == 0 && ret == 8)
 		{
-			std::vector<std::uint8_t> cbor_map = map_to_cbor_json(to_send);
+			std::vector<std::uint8_t> cbor_map = map_to_json(to_send);
 			size_t buffer_size = cbor_map.size();
-			// send future buffer size
 
-			sendto(remote_sock, &buffer_size, buffer_size,
-				   0, (sockaddr *)&remote_sock_addr, length);
-// 161, 97, 48,163,102,99,111,111,114,100,115,162,97,120,24,35,97,121,24,45,98,105,112,105,49,50,55,46,48,46,48,46,49,99,117,105,100
+			sendto(remote_sock, &buffer_size, sizeof(buffer_size),
+							0, (sockaddr *)&remote_sock_addr, length);
 			// send buffer content
-			sendto(remote_sock, cbor_map.data(), buffer_size,
-				   0, (sockaddr *)&remote_sock_addr, length);
+			sendto(remote_sock, &cbor_map.data()[0], buffer_size,
+							0, (sockaddr *)&remote_sock_addr, length);
+
+			// unsigned char* test = new unsigned char[buffer_size];//init this with the correct size
+			// std::copy(cbor_map.begin(),cbor_map.end(),test);
+			// sendto(remote_sock, test, buffer_size*sizeof(char),
+			// 	   0, (sockaddr *)&remote_sock_addr, length);
+			// delete [] test;
+// // 161, 97, 48,163,102,99,111,111,114,100,115,162,97,120,24,35,97,121,24,45,98,105,112,105,49,50,55,46,48,46,48,46,49,99,117,105,100
+// 			// send buffer content
+// 			sendto(remote_sock, cbor_map.data(), buffer_size,
+// 				   0, (sockaddr *)&remote_sock_addr, length);
 		}
 
 		if (strcmp(command_buffer, "q") == 0 ||

@@ -3,13 +3,13 @@
 
 void JsonWrapperTest::testConvertToJsonCBOR()
 {
-    auto cbor = map_to_cbor_json(test_map);
+    auto cbor = map_to_json(test_map);
     CPPUNIT_ASSERT(cbor == predefined_cbor);
 }
 
 void JsonWrapperTest::testConvertToMap()
 {
-    auto map_from_json = json_cbor_to_map(predefined_cbor);
+    auto map_from_json = json_to_map(predefined_cbor);
     CPPUNIT_ASSERT(test_map == map_from_json);
 }
 

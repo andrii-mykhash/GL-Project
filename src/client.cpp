@@ -5,16 +5,81 @@
 #include <cstring>
 #include <errno.h>
 
+#include <fstream>
 #include <map>
-#include <iostream>
+// #include <iostream>
 #include "../inc/user.hpp"
 #include "../inc/json_wrapper.hpp"
 
 const int PORT = 8088;
 
+void draw(std::fstream *tty, std::map<int,User> users)
+{
+    /*
+        Output field that have got 80x24 dimention and contain all curent users
+    */
+
+    tty->flush();
+    char paint[80][24] = {'\0'};
+    for (auto it = users.cbegin(); it != users.cend(); ++it)
+    {
+        paint[it->second.coords.x][it->second.coords.y] = '*';
+    }
+
+    // Draw grid
+    // +----+
+    // |    |
+    // |    |
+    // +----+
+
+    *tty << "+";
+    for (int i = 0; i < 80; i++)
+    {
+        *tty << "-";
+    }
+    *tty << "+\n";
+
+    for (int y = 0; y < 24; y++)
+    {
+        *tty << "|";
+        for (int x = 0; x < 80; x++)
+        {
+            if (paint[x][y] == '\0')
+            {
+                *tty << " ";
+            }
+            else
+            {
+                *tty << "\033[" << paint[x][y];
+            }
+        }
+        *tty << "|\n";
+    }
+
+    *tty << "+";
+    for (int i = 0; i < 80; i++)
+    {
+        *tty << "-";
+    }
+    *tty << "+\n";
+    tty->flush();
+}
+
+
+
+
+
 int main()
 {
-    //-----------------------connecting stage------------------------
+
+    std::unique_ptr<std::fstream> tty = std::make_unique<std::fstream>("/dev/tty", tty->in | tty->out | tty->trunc);
+    if(!tty->is_open())
+    {
+        std::cerr << "tty open error" << std::endl;
+        exit(-1);
+    }
+
+//-----------------------connecting stage------------------------
     char buffer[8];
     char *ip_str = (char *)malloc(16);
     printf("Write IP to connect: ");
@@ -44,7 +109,7 @@ int main()
         exit(-3);
     }
 
-    //-----------------------sharing data stage------------------------
+//-----------------------sharing data stage------------------------
 
     // create containers
     unsigned char x_y_buff[2] = {0};
@@ -53,43 +118,43 @@ int main()
 
     std::map<int, User> users;
     std::vector<std::uint8_t> cbor_data;
-
     while (1)
     {
         memset(&buffer, 0, 8 * sizeof(char));
         scanf("%s", buffer);
         send(sock, buffer, 8 * sizeof(char), 0);
 
-        // exit
+// exit
         if (strcmp(buffer, "q") == 0 || 
             strcmp(buffer, "exit") == 0)
         {
             break;
         }
 
-        //  getiing map
+//  getiing map
         if (strcmp(buffer, "map\0") == 0)
         {
             cbor_data.clear();
             size_t buffer_size = 0;
-
-            ret = recv(sock, &buffer_size, sizeof(size_t), 0);
-
+            ret = recv(sock, &buffer_size, sizeof(buffer_size), 0);
             cbor_data.resize(buffer_size);
 
-            printf("ret=%d, buffer_size=%lu",
-                   ret, buffer_size);
-//, vector_size=%lu
-            ret = recv(sock, &cbor_data[0], buffer_size, 0);
-            users = json_cbor_to_map(cbor_data);
+            // printf("ret=%d, buffer_size=%lu\n", ret, buffer_size);
+
+            ret = recv(sock, cbor_data.data(), buffer_size, 0);
+            users = json_to_map(cbor_data);
+            
             for (auto it = users.cbegin(); it != users.cend(); ++it)
             {
-                std::cout << it->second.coords.x << "x"
-                          << it->second.coords.y << ":\t" << it->second.ip << "\n";
+                *tty << it->second.coords.x << "x"
+                        << it->second.coords.y << ":\t" << it->second.ip << "\n";
+                // printf("x=%i, y=%i, ip=%s\n",it->second.coords.x,it->second.coords.y,it->second.ip.c_str());
             }
+            *tty << "\033c";
+            draw(tty.get(), users);
         }
 
-        // moving dot
+// moving dot
         if (strcmp(buffer, "move\0") == 0)
         {
             scanf("%d", &x_cin);
@@ -108,7 +173,7 @@ int main()
         }
     }
 
-    //-----------------------cleaning stage------------------------
+//-----------------------cleaning stage------------------------
 
     if (shutdown(sock, SHUT_RDWR) != 0)
     {
