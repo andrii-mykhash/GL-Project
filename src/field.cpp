@@ -16,9 +16,10 @@ int Field::createUser(std::string ip)
     std::uniform_int_distribution<int> y(0, Field::HEIGHT);
     User temp_user;
     temp_user.ip = ip;
-    temp_user.uid = Field::id_count;
-
     bool isnt_done = true;
+    std::lock_guard<std::mutex> lock(map_mutex);
+    temp_user.uid = Field::id_count;
+    Field::id_count++;
     while (isnt_done)
     {
         temp_user.coords.x = x(e1);
@@ -30,7 +31,6 @@ int Field::createUser(std::string ip)
     }
 
     users[temp_user.uid] = temp_user;
-    Field::id_count++;
     return temp_user.uid;
 }
 
@@ -39,7 +39,7 @@ bool Field::hasCollision(User& to_verify) const
     /*
         Check if given position has collision in 'users' collecion
     */
-
+    std::lock_guard<std::mutex> lock1(collision_mutex);
     for (auto it = users.begin(); it != users.end(); it++)
     {
         if ((it->second.coords <=> to_verify.coords) == 0 && to_verify.uid != it->first)
@@ -120,6 +120,7 @@ int Field::move(User& to_move)
     */
     if (!hasCollision(to_move))
     {
+        std::lock_guard<std::mutex> lock(map_mutex);
         users[to_move.uid] = to_move;
         return 0;
     }
@@ -144,6 +145,7 @@ void Field::remove(User u)
     /*
         Delete user from collection
     */
+    std::lock_guard<std::mutex> lock(map_mutex);
     users.erase(u.uid);
 }
 
