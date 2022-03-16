@@ -8,7 +8,7 @@
 #include <string>
 #include <random>
 #include <fstream>
-// #include <mutex>
+#include <mutex>
 
 class Field
 {
@@ -18,6 +18,8 @@ private:
     static int id_count;
     std::random_device rand_device;
     std::map<int, User> users;
+    std::mutex map_mutex;
+    mutable std::mutex collision_mutex;
 public:
     bool hasCollision(User& to_verify) const;
     int createUser(std::string ip);
