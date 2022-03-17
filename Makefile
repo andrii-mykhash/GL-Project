@@ -31,11 +31,17 @@ server: field.o $(SRC)/server.cpp
 	$(CC) $(CXX_FLAGS) $(SRC)/server.cpp -o server $(BUILD)/dot.o $(BUILD)/field.o
 	mv server $(BUILD)/
 
-client: field.o $(SRC)/client.cpp
-	$(CC) $(CXX_FLAGS) $(SRC)/client.cpp -o client $(BUILD)/dot.o $(BUILD)/field.o
-	mv client $(BUILD)/
+client.o: $(SRC)/client.cpp
+	$(CC) $(CXX_FLAGS) $(SRC)/client.cpp -c
+	mv client.o $(BUILD)/
 
-sc: field.o client server
+
+client_main: field.o client.o $(SRC)/client.cpp
+	$(CC) $(CXX_FLAGS) $(SRC)/client_main.cpp -o client_main \
+	$(BUILD)/dot.o $(BUILD)/field.o $(BUILD)/client.o
+	mv client_main $(BUILD)/
+
+sc: client_main server
 
 #------------ Test -----------
  
