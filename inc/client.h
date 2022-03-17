@@ -33,15 +33,16 @@ private:
         W = 'w'
     };
 
-    const char *RED = "\033[0;31m";
-    const char *GREEN = "\033[1;32m";
-    const char *YELLOW = "\033[1;33m";
+    // const char *RED = "\033[0;31m";
+    // const char *GREEN = "\033[1;32m";
+    // const char *YELLOW = "\033[1;33m";
     const char *CYAN = "\033[0;36m";
-    const char *MAGENTA = "\033[0;35m";
+    // const char *MAGENTA = "\033[0;35m";
     const char *RESET = "\033[0m";
 
 public:
     UserClient(std::string ip, const int port);
+    
     ~UserClient();
 
     void recvMap();

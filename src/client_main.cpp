@@ -8,7 +8,7 @@ int main()
     std::cout << "Write IP to connect: ";
     std::cin >> ip_str;
 
-    UserClient us(ip_str, PORT);//, tty->get());
+    UserClient us(ip_str, PORT);
 
     unsigned char move_offset = '\0';
     while (1)

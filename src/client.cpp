@@ -31,6 +31,7 @@ UserClient::UserClient(std::string ip, const int port)
     recvID();
     initTTY();
 }
+
 UserClient::~UserClient()
 {
     if (shutdown(sock, SHUT_RDWR) != 0)
