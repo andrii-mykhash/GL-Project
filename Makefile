@@ -1,4 +1,4 @@
-CXX_FLAGS = -std=c++20 -g -Wall -Iinc 
+CXX_FLAGS = -std=c++20 -g -Wall -Iinc -pthread
 SRC = src
 BUILD = build
 TEST = test
