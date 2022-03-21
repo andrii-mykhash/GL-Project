@@ -4,7 +4,7 @@
 #include "../inc/client.h"
 #include "../inc/json_wrapper.hpp"
 
-UserClient::UserClient(std::string ip, const int port)
+Client::Client(std::string ip, const int port)
 {
     sockaddr_in serv_addr;
 
@@ -28,7 +28,7 @@ UserClient::UserClient(std::string ip, const int port)
     initTTY();
 }
 
-UserClient::~UserClient()
+Client::~Client()
 {
     if (shutdown(sock, SHUT_RDWR) != 0)
     {
@@ -37,7 +37,7 @@ UserClient::~UserClient()
     close(sock);
 }
 
-void UserClient::recvMap()
+void Client::recvMap()
 {
     cbor_data.clear();
     size_t buffer_size = 0;
@@ -56,7 +56,7 @@ void UserClient::recvMap()
     users = json_to_map(cbor_data);
 }
 
-bool UserClient::isMovableChar(char move_offset)
+bool Client::isMovableChar(char move_offset)
 {
     return (move_offset == ComandKeys::W)
                ? false : (move_offset == ComandKeys::A)
@@ -66,13 +66,13 @@ bool UserClient::isMovableChar(char move_offset)
                ? false : true;
 }
 
-void UserClient::sendMoveDirection(char move_offset)
+void Client::sendMoveDirection(char move_offset)
 {
     send(sock, &id, sizeof(id), 0);
     send(sock, &move_offset, sizeof(move_offset), 0);
 }
 
-void UserClient::recvID()
+void Client::recvID()
 {
     ret = recv(sock, &id, sizeof(id), 0);
     if (ret != sizeof(id))
@@ -81,7 +81,7 @@ void UserClient::recvID()
     }
 }
 
-void UserClient::initTTY()
+void Client::initTTY()
 {//                        /dev/stdout    /dev/tty
     tty = std::make_unique<std::fstream>("/dev/stdout", tty->in | tty->out | tty->trunc);
     if (!tty->is_open())
@@ -90,16 +90,16 @@ void UserClient::initTTY()
     }
 }
 
-void UserClient::draw()
+void Client::draw()
 {
+    *tty << "\033[2J\033[;H";
     printAllUsers();
     drawField();
+    tty->flush();
 }
 
-void UserClient::printAllUsers()
+void Client::printAllUsers()
 {
-    *tty << "\033c";
-
     for (auto it = users.cbegin(); it != users.cend(); ++it)
     {
         if (it->first == id)
@@ -112,15 +112,13 @@ void UserClient::printAllUsers()
         *tty << it->first << ")\t" << it->second.coords.x << "x"
              << it->second.coords.y << ":\t" << it->second.ip << "\n";
     }
-    tty->flush();
 }
 
-void UserClient::drawField()
+void Client::drawField()
 {
     /*
         Output field that have got 80x24 dimention and contain all curent users
     */
-    tty->flush();
     char paint[80][24] = {'\0'};
     for (auto it = users.cbegin(); it != users.cend(); ++it)
     {
@@ -169,5 +167,4 @@ void UserClient::drawField()
         *tty << "-";
     }
     *tty << "+\n";
-    tty->flush();
 }

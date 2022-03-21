@@ -17,7 +17,6 @@ private:
 
 	int thread_id = 0;
 	Field field;
-	// std::vector<std::thread> threads;
 
 public:
 	Server();
@@ -25,8 +24,12 @@ public:
 	~Server();
 
 	int acceptConnection(sockaddr_in& remote_sock_addr);
+	
+	void connectionManager(int remote_sock, const int thread_id);
 
 	int createUser(int remote_sock, sockaddr_in& remote_sock_addr);
+
+private:
 
 	void sendMap(int remote_sock);
 
@@ -38,7 +41,6 @@ public:
 
 	void closeRemoteConnection(int remote_sock, User to_remove);
 
-	void connectionManager(int remote_sock, const int thread_id);
 };
 
 

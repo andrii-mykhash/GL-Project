@@ -8,11 +8,11 @@ CC = g++-10
 
 all: build test sc
 
-#------------ Build -----------
+#------------ Build  -----------
 
-build: mkdir $(SRC)/field.cpp dot.o field.o
-	$(CC) $(CXX_FLAGS) $(SRC)/main.cpp -o main $(BUILD)/dot.o $(BUILD)/field.o
-	mv main build/
+build: mkdir dot.o field.o
+	# $(CC) $(CXX_FLAGS) $(SRC)/main.cpp -o main $(BUILD)/dot.o $(BUILD)/field.o
+	# mv main build/
 
 mkdir: 
 	mkdir -p build
