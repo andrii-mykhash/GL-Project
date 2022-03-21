@@ -1,9 +1,5 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <cstring>
-#include <errno.h>
 
 #include "../inc/client.h"
 #include "../inc/json_wrapper.hpp"
@@ -60,25 +56,14 @@ void UserClient::recvMap()
     users = json_to_map(cbor_data);
 }
 
-void UserClient::draw()
-{
-    printAllUsers();
-    drawField();
-}
-
 bool UserClient::isMovableChar(char move_offset)
 {
     return (move_offset == ComandKeys::W)
-               ? false
-           : (move_offset == ComandKeys::A)
-               ? false
-           : (move_offset == ComandKeys::S)
-               ? false
-           : (move_offset == ComandKeys::D)
-               ? false
-           : (move_offset == ComandKeys::Q)
-               ? false
-               : true;
+               ? false : (move_offset == ComandKeys::A)
+               ? false : (move_offset == ComandKeys::S)
+               ? false : (move_offset == ComandKeys::D)
+               ? false : (move_offset == ComandKeys::Q)
+               ? false : true;
 }
 
 void UserClient::sendMoveDirection(char move_offset)
@@ -87,14 +72,6 @@ void UserClient::sendMoveDirection(char move_offset)
     send(sock, &move_offset, sizeof(move_offset), 0);
 }
 
-void UserClient::initTTY()
-{
-    tty = std::make_unique<std::fstream>("/dev/tty", tty->in | tty->out | tty->trunc);
-    if (!tty->is_open())
-    {
-        throw "tty open error";
-    }
-}
 void UserClient::recvID()
 {
     ret = recv(sock, &id, sizeof(id), 0);
@@ -102,6 +79,21 @@ void UserClient::recvID()
     {
         printf("error, ret-%d != 4 - sizeof(id)\n", ret);
     }
+}
+
+void UserClient::initTTY()
+{//                        /dev/stdout    /dev/tty
+    tty = std::make_unique<std::fstream>("/dev/stdout", tty->in | tty->out | tty->trunc);
+    if (!tty->is_open())
+    {
+        throw "tty open error";
+    }
+}
+
+void UserClient::draw()
+{
+    printAllUsers();
+    drawField();
 }
 
 void UserClient::printAllUsers()

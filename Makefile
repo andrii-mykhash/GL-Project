@@ -27,21 +27,26 @@ field.o: $(SRC)/field.cpp dot.o
 
 #-----------ServerClient------
 
-server: field.o $(SRC)/server.cpp
-	$(CC) $(CXX_FLAGS) $(SRC)/server.cpp -o server $(BUILD)/dot.o $(BUILD)/field.o
-	mv server $(BUILD)/
+server.o: $(SRC)/server.cpp
+	$(CC) $(CXX_FLAGS) $(SRC)/server.cpp -c
+	mv server.o $(BUILD)/
+
+server_main: field.o server.o $(SRC)/server_main.cpp
+	$(CC) $(CXX_FLAGS) $(SRC)/server_main.cpp -o server_main \
+	$(BUILD)/dot.o $(BUILD)/field.o $(BUILD)/server.o
+	mv server_main $(BUILD)/
 
 client.o: $(SRC)/client.cpp
 	$(CC) $(CXX_FLAGS) $(SRC)/client.cpp -c
 	mv client.o $(BUILD)/
 
 
-client_main: field.o client.o $(SRC)/client.cpp
+client_main: field.o client.o $(SRC)/client_main.cpp
 	$(CC) $(CXX_FLAGS) $(SRC)/client_main.cpp -o client_main \
 	$(BUILD)/dot.o $(BUILD)/field.o $(BUILD)/client.o
 	mv client_main $(BUILD)/
 
-sc: client_main server
+sc: client_main server_main
 
 #------------ Test -----------
  

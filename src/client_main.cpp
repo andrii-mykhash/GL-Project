@@ -1,7 +1,6 @@
 #include <iostream>
 #include "../inc/client.h"
 
-
 int main()
 {
     std::string ip_str;
@@ -20,14 +19,14 @@ int main()
         {
             std::cin >> move_offset;
         } while (us.isMovableChar(move_offset));
-        
+
         us.sendMoveDirection(move_offset);
-        if(move_offset == 'q')
+        if (move_offset == 'q')
         {
             break;
         }
         move_offset = '\0';
     }
-    
+
     return 0;
 }
