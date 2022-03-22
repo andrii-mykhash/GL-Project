@@ -24,7 +24,11 @@ Client::Client(std::string ip, const int port)
     {
         throw "connection failed";
     }
-    recvID();
+    ret = recv(sock, &id, sizeof(id), 0);
+    if (ret != sizeof(id))
+    {
+        printf("error, ret - %d != 4 - sizeof(id)\n", ret);
+    }
     initTTY();
 }
 
@@ -45,13 +49,13 @@ void Client::recvMap()
     ret = recv(sock, &buffer_size, sizeof(buffer_size), 0);
     if (ret != sizeof(buffer_size))
     {
-        printf("error, ret-%d != %lu - sizeof(buffer_size)\n", ret, buffer_size);
+        printf("error, ret - %d != %lu - sizeof(buffer_size)\n", ret, buffer_size);
     }
     cbor_data.resize(buffer_size);
     ret = recv(sock, cbor_data.data(), buffer_size, 0);
     if ((size_t)ret != buffer_size)
     {
-        printf("error, ret-%d != %lu - map buffer_size", ret, buffer_size);
+        printf("error, ret - %d != %lu - map buffer_size", ret, buffer_size);
     }
     users = json_to_map(cbor_data);
 }
@@ -68,17 +72,7 @@ bool Client::isMovableChar(char move_offset)
 
 void Client::sendMoveDirection(char move_offset)
 {
-    send(sock, &id, sizeof(id), 0);
     send(sock, &move_offset, sizeof(move_offset), 0);
-}
-
-void Client::recvID()
-{
-    ret = recv(sock, &id, sizeof(id), 0);
-    if (ret != sizeof(id))
-    {
-        printf("error, ret-%d != 4 - sizeof(id)\n", ret);
-    }
 }
 
 void Client::initTTY()
@@ -104,7 +98,7 @@ void Client::printAllUsers()
     {
         if (it->first == id)
         {
-            *tty << CYAN << it->second.coords.x << "x"
+            *tty << it->first << ")\t" << CYAN << it->second.coords.x << "x"
                  << it->second.coords.y << ":\t" << it->second.ip << "\n"
                  << RESET;
             continue;

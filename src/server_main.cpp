@@ -1,29 +1,37 @@
 #include "../inc/server.h"
-#include <vector>
-#include <functional>
 #include <cstring>
+#include <iostream>
+#include <atomic>
 
+std::atomic<bool> can_work = true;
 int main()
 {       
-    sockaddr_in sock_addr;
-	std::vector<std::thread> threads;
+    std::thread t1{
+    [&]() 
+    {	
+        std::string s;
+        while (std::cin >> s)
+        {
+            if (s == "exit" || s == "q")
+            {
+                std::cout << "\nexit command given on stdin\nclossing...";
+                can_work = false;
+                break;
+            }		
+        }
+    }};
+    t1.detach();
+
 	Server s;
-    int client_countrer = 0;
+    sockaddr_in sock_addr;
     int remote_sock;
-    auto connnect_manager = std::bind(&Server::connectionManager,
-            std::ref(s), std::placeholders::_1, std::placeholders::_2);
-    while(1)
+   
+    while(can_work)
     {
-        remote_sock = 0;
         memset(&sock_addr, 0, sizeof(sock_addr));
-       	remote_sock = s.acceptConnection(sock_addr);
-		s.createUser(remote_sock, sock_addr);
-        threads.push_back(
-                std::thread(connnect_manager, remote_sock, client_countrer++));
+        remote_sock = s.acceptConnection(sock_addr);
+        s.createTread(remote_sock,sock_addr);
     }
-    for (auto & t : threads)
-	{
-		t.join();
-	}
+   
 
 }

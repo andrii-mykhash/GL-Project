@@ -13,10 +13,6 @@ struct User
     {
         return this->uid <=> rhs.uid;
     } 
-    bool operator< (const User rhs) const
-    {
-        return this->uid < rhs.uid;
-    }  
     bool operator== (const User rhs) const
     {
         return this->uid == rhs.uid;

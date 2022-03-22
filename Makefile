@@ -10,9 +10,9 @@ all: build test sc
 
 #------------ Build  -----------
 
-build: mkdir dot.o field.o
-	# $(CC) $(CXX_FLAGS) $(SRC)/main.cpp -o main $(BUILD)/dot.o $(BUILD)/field.o
-	# mv main build/
+# build: mkdir dot.o field.o
+# 	# $(CC) $(CXX_FLAGS) $(SRC)/main.cpp -o main $(BUILD)/dot.o $(BUILD)/field.o
+# 	# mv main build/
 
 mkdir: 
 	mkdir -p build
@@ -31,9 +31,13 @@ server.o: $(SRC)/server.cpp
 	$(CC) $(CXX_FLAGS) $(SRC)/server.cpp -c
 	mv server.o $(BUILD)/
 
-server_main: field.o server.o $(SRC)/server_main.cpp
+remote_client_manager.o: $(SRC)/remote_client_manager.cpp
+	$(CC) $(CXX_FLAGS) $(SRC)/remote_client_manager.cpp -c
+	mv remote_client_manager.o $(BUILD)/
+
+server_main: field.o server.o remote_client_manager.o $(SRC)/server_main.cpp
 	$(CC) $(CXX_FLAGS) $(SRC)/server_main.cpp -o server_main \
-	$(BUILD)/dot.o $(BUILD)/field.o $(BUILD)/server.o
+	$(BUILD)/dot.o $(BUILD)/field.o $(BUILD)/server.o  $(BUILD)/remote_client_manager.o
 	mv server_main $(BUILD)/
 
 client.o: $(SRC)/client.cpp

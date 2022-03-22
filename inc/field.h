@@ -12,6 +12,20 @@
 
 class Field
 {
+public:
+    bool hasCollision(User& to_verify) const;
+    
+    int createUser(std::string ip);
+    
+    int move(User& to_move);
+    
+    void remove(User to_remove);
+    
+    int getUser(int id, User& to_return);
+    
+    std::map<int, User> getMap();
+
+
 private:
     static const int WIDTH = 80;
     static const int HEIGHT = 80;
@@ -20,17 +34,6 @@ private:
     std::map<int, User> users;
     std::mutex map_mutex;
     mutable std::mutex collision_mutex;
-public:
-    bool hasCollision(User& to_verify) const;
-    int createUser(std::string ip);
-    int move(User& to_move);
-    void remove(User to_remove);
-    int getUser(int id, User& to_return);
-    std::map<int, User> getMap();
-
-    // to remove
-    void draw(std::fstream* tty);
-    void showAllUsers() const;
 };
 
 
