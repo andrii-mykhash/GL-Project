@@ -6,58 +6,103 @@
 
 Client::Client(std::string ip, const int port)
 {
+    server_sock = connectToServer(ip,8088);
+
+
+    multicast_sock = connectToServer(ip,8089);
+    ret = recv(server_sock, &id, sizeof(id), 0);
+    if (ret != sizeof(id))
+    {
+        int err = errno;
+        std::string str = "recv: id - ";
+        str.append(std::to_string(ret))
+            .append(" != 4 - sizeof(int)\n strerror= ").append(strerror(err));
+        throw std::runtime_error(str);
+    }
+    initTTY();
+    map_tread = std::thread([&]
+    {
+        while(move_char != 'q')
+        {
+            // usleep(300);
+            sleep(1);
+            recvMap();
+            draw();
+            *tty << "Move - w/a/s/d; Quit - q: ";
+            tty->flush();
+        }
+    });
+}
+
+Client::~Client()
+{
+    if (shutdown(multicast_sock, SHUT_RDWR) != 0)
+    {
+        fprintf(stderr,"socket shutdown failed");
+    }
+    close(multicast_sock);
+    if(map_tread.joinable())
+    {
+        map_tread.join();
+    }
+    if (shutdown(server_sock, SHUT_RDWR) != 0)
+    {
+        fprintf(stderr,"socket shutdown failed");
+    }
+    close(server_sock);
+}
+
+int Client::connectToServer(std::string ip, const int port)
+{
+    int sock;
     sockaddr_in serv_addr;
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-        throw "socket creation error";
+        int err = errno;
+        std::string str = "socket: strerror= ";
+        str.append(strerror(err));
+        throw std::runtime_error(str);
     }
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
 
     if (inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr) <= 0)
     {
-        throw "invalid addr";
+        int err = errno;
+        std::string str = "inet_pton: invalid address, strerror= ";
+        str.append(strerror(err));
+        throw std::runtime_error(str);
     }
 
     if (connect(sock, (sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     {
-        throw "connection failed";
+        int err = errno;
+        std::string str = "connect: strerror= ";
+        str.append(strerror(err));
+        throw std::runtime_error(str);
     }
-    ret = recv(sock, &id, sizeof(id), 0);
-    if (ret != sizeof(id))
-    {
-        printf("error, ret - %d != 4 - sizeof(id)\n", ret);
-    }
-    initTTY();
+    return sock;
 }
 
-Client::~Client()
-{
-    if (shutdown(sock, SHUT_RDWR) != 0)
-    {
-        perror("socket shutdown failed");
-    }
-    close(sock);
-}
 
-void Client::recvMap()
+
+int Client::recvMap()
 {
+    std::lock_guard<std::mutex> lock(map_mutex);
     cbor_data.clear();
     size_t buffer_size = 0;
-    std::lock_guard<std::mutex> lock(map_mutex);
-    ret = recv(sock, &buffer_size, sizeof(buffer_size), 0);
-    if (ret != sizeof(buffer_size))
-    {
-        printf("error, ret - %d != %lu - sizeof(buffer_size)\n", ret, buffer_size);
-    }
+    ret = recv(multicast_sock, &buffer_size, sizeof(buffer_size), 0);
+
     cbor_data.resize(buffer_size);
-    ret = recv(sock, cbor_data.data(), buffer_size, 0);
+    ret = recv(multicast_sock, cbor_data.data(), buffer_size, 0);
     if ((size_t)ret != buffer_size)
     {
-        printf("error, ret - %d != %lu - map buffer_size", ret, buffer_size);
+        fprintf(stderr,"corrupted json length error: ret - %d != %lu - buffer_size", ret, buffer_size);
+        return -1;
     }
     users = json_to_map(cbor_data);
+    return 0;
 }
 
 bool Client::isMovableChar(char move_offset)
@@ -72,7 +117,8 @@ bool Client::isMovableChar(char move_offset)
 
 void Client::sendMoveDirection(char move_offset)
 {
-    send(sock, &move_offset, sizeof(move_offset), 0);
+    move_char = move_offset;
+    send(server_sock, &move_offset, sizeof(move_offset), 0);
 }
 
 void Client::initTTY()
@@ -80,13 +126,13 @@ void Client::initTTY()
     tty = std::make_unique<std::fstream>("/dev/stdout", tty->in | tty->out | tty->trunc);
     if (!tty->is_open())
     {
-        throw "tty open error";
+        throw std::runtime_error("tty open error");
     }
 }
 
 void Client::draw()
 {
-    *tty << "\033[2J\033[;H";
+    *tty << "\033c";//[2J\033[;H";
     printAllUsers();
     drawField();
     tty->flush();

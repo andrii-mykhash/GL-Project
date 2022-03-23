@@ -4,11 +4,13 @@
 #include "field.h"
 #include <arpa/inet.h>
 #include <thread>
+// #include "../inc/json_wrapper.hpp"
+
 
 class RemoteClientManager
 {
 public:
-	RemoteClientManager(int remote_sock, 
+	RemoteClientManager(int remote_sock,   int ml_sock,
             Field* field_r, int thread_id, sockaddr_in& addr);
 
     void run();
@@ -16,11 +18,11 @@ public:
     void stop(); 
 
 private:
-    void closeConnection();
+    void closeConnection(int sock);
     
 	int createUser(sockaddr_in &remote_sock_addr);
 
-	void sendMap();
+	// void sendMap();
 
 	char recvMoveDirection();
 
@@ -34,6 +36,7 @@ private:
 	Field* field;
 	int thread_id;
 	int id;
+    int ml_sock;
 };
 
 #endif

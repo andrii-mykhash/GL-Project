@@ -12,9 +12,12 @@ int main()
     unsigned char move_offset = '\0';
     while (1)
     {
-        us.recvMap();
-        us.draw();
-        std::cout << "Move - w/a/s/d; Quit - q: ";
+        // if(us.recvMap() == -1)
+        // {
+        //     continue;
+        // }
+        // us.draw();
+        // std::cout << "Move - w/a/s/d; Quit - q: ";
         do
         {
             std::cin >> move_offset;
@@ -27,6 +30,5 @@ int main()
         }
         move_offset = '\0';
     }
-
-    return 0;
+    return 0; 
 }

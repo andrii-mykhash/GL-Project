@@ -1,27 +1,26 @@
 #include "../inc/remote_client_manager.h"
-#include "../inc/json_wrapper.hpp"
 #include <unistd.h>
 #include <string.h>
 
 
 
-RemoteClientManager::RemoteClientManager(int remote_sock, 
+RemoteClientManager::RemoteClientManager(int remote_sock, int ml_sock,
         Field* field_r, int thread_id, sockaddr_in& addr) 
-        : remote_socket(remote_sock), field(field_r), thread_id(thread_id)
+        : remote_socket(remote_sock), field(field_r), thread_id(thread_id), ml_sock(ml_sock)
 {
     id = createUser(addr);
 }
 
-void RemoteClientManager::closeConnection()
+void RemoteClientManager::closeConnection(int sock)
 {
-    if (shutdown(remote_socket, SHUT_RDWR) != 0)
+    if (shutdown(sock, SHUT_RDWR) != 0)
     {
         int error = errno;
-        printf("closing socket: strerror=%d: \
+        fprintf(stderr,"error closing socket: strerror=%d: \
             %s thread_id=%d\n", error, strerror(error), thread_id);
     }
-    close(remote_socket);
-    printf("close connection: fd=%d \n", remote_socket);
+    close(sock);
+    printf("close connection: sock_fd=%d \n", sock);
 }
 
 int RemoteClientManager::createUser(sockaddr_in &remote_sock_addr)
@@ -36,17 +35,17 @@ int RemoteClientManager::createUser(sockaddr_in &remote_sock_addr)
     return id;
 }
 
-void RemoteClientManager::sendMap()
-{
-    size_t map_buffer_size;
-    std::map<int, User> to_send = field->getMap();
+// void RemoteClientManager::sendMap()
+// {
+//     size_t map_buffer_size;
+//     std::map<int, User> to_send = field->getMap();
 
-    std::vector<std::uint8_t> cbor_map = map_to_json(to_send);
-    map_buffer_size = cbor_map.size();
+//     std::vector<std::uint8_t> cbor_map = map_to_json(to_send);
+//     map_buffer_size = cbor_map.size();
 
-    send(remote_socket, &map_buffer_size, sizeof(map_buffer_size), 0);
-    send(remote_socket, &cbor_map.data()[0], map_buffer_size, 0);
-}
+//     send(remote_socket, &map_buffer_size, sizeof(map_buffer_size), 0);
+//     send(remote_socket, &cbor_map.data()[0], map_buffer_size, 0);
+// }
 
 char RemoteClientManager::recvMoveDirection()
 {
@@ -117,7 +116,7 @@ void RemoteClientManager::manageConnection()
     current_user.uid = id;
     while (1)
     {
-        sendMap();
+        // sendMap();
         command_buffer = recvMoveDirection();
         field->getUser(current_user.uid, current_user);
         move(command_buffer, current_user);
@@ -128,5 +127,6 @@ void RemoteClientManager::manageConnection()
         field->move(current_user);
         command_buffer = '\0';
     }
-    closeConnection();
+    closeConnection(remote_socket);
+    closeConnection(ml_sock);
 }

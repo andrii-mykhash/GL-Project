@@ -8,6 +8,8 @@
 #include "user.hpp"
 #include <fstream>
 #include <memory>
+#include <thread>
+#include <atomic>
 
 const int PORT = 8088;
 
@@ -18,7 +20,7 @@ public:
     
     ~Client();
 
-    void recvMap();
+    int recvMap();
 
     void draw();
 
@@ -27,6 +29,8 @@ public:
     void sendMoveDirection(char move_offset);
 
 private:
+    int connectToServer(std::string ip, const int port);
+
     void initTTY();
 
     void printAllUsers();
@@ -34,10 +38,13 @@ private:
     void drawField();
 
 private:
-    int sock;
+    int server_sock;
+    int multicast_sock;
     int ret;
     int id;
-
+    std::atomic<char> move_char;
+    std::thread map_tread;
+    std::mutex map_writer_mutex;
     User currend_user;
     std::map<int, User> users;
     std::vector<std::uint8_t> cbor_data;
