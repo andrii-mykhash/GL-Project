@@ -2,12 +2,11 @@
 #include <unistd.h>
 #include <string.h>
 
-
-
-RemoteClientManager::RemoteClientManager(int remote_sock, int ml_sock,
+RemoteClientManager::RemoteClientManager(int remote_sock,
         Field* field_r, int thread_id, sockaddr_in& addr) 
-        : remote_socket(remote_sock), field(field_r), thread_id(thread_id), ml_sock(ml_sock)
+        : remote_socket(remote_sock), field(field_r), thread_id(thread_id)
 {
+    
     id = createUser(addr);
 }
 
@@ -30,30 +29,36 @@ int RemoteClientManager::createUser(sockaddr_in &remote_sock_addr)
     std::string ip = str;
     ip.append(":");
     ip.append(std::to_string(ntohs(remote_sock_addr.sin_port)));
-    int id = field->createUser(std::string(ip));
+    id = field->createUser(std::string(ip));
     send(remote_socket, &id, sizeof(id), 0);
     return id;
 }
 
-// void RemoteClientManager::sendMap()
-// {
-//     size_t map_buffer_size;
-//     std::map<int, User> to_send = field->getMap();
-
-//     std::vector<std::uint8_t> cbor_map = map_to_json(to_send);
-//     map_buffer_size = cbor_map.size();
-
-//     send(remote_socket, &map_buffer_size, sizeof(map_buffer_size), 0);
-//     send(remote_socket, &cbor_map.data()[0], map_buffer_size, 0);
-// }
+bool RemoteClientManager::isCorrectChar(char to_verify)
+{
+    return(to_verify == 'w')
+               ? false : (to_verify == 'a')
+               ? false : (to_verify == 's')
+               ? false : (to_verify == 'd')
+               ? false : (to_verify == 'q')
+               ? false : true;
+}
 
 char RemoteClientManager::recvMoveDirection()
 {
     char command_buffer;
     int ret = recv(remote_socket,
              &command_buffer, sizeof(command_buffer), 0);
-    printf("ret=%d\tbuff_char=%c\tthread_id=%d\n", 
-            ret, command_buffer, thread_id);
+    int error_code = 0;
+    socklen_t error_code_size = sizeof(error_code);;
+    int check = getsockopt(remote_socket, SOL_SOCKET, SO_ERROR, &error_code, &error_code_size);
+    printf("thread_id=%d\t\tret=%d\t\tbuff_char=%c\n", 
+            thread_id, ret, command_buffer);
+    if(check != 0 || ret == -1 || (ret == 0 && command_buffer == '\0'))
+    {
+        printf("q, check=%i\n", check); 
+        return 'q';
+    }
     return command_buffer;
 }
 
@@ -106,27 +111,27 @@ void RemoteClientManager::run()
 
 void RemoteClientManager::stop()
 {
-    t_mc.join();
+    if(t_mc.joinable())
+    {
+        t_mc.join();
+    }
 }
 
 void RemoteClientManager::manageConnection()
 {
     User current_user;
-    char command_buffer;
+    char command_buffer = '\0';
     current_user.uid = id;
     while (1)
     {
-        // sendMap();
         command_buffer = recvMoveDirection();
         field->getUser(current_user.uid, current_user);
         move(command_buffer, current_user);
-        if (command_buffer == 'q')
+        if(command_buffer == 'q')
         {
             break;
         }
         field->move(current_user);
-        command_buffer = '\0';
     }
     closeConnection(remote_socket);
-    closeConnection(ml_sock);
 }

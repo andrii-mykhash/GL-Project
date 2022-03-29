@@ -11,36 +11,35 @@
 class Server
 {
 public:
-	// Server();
+	Server();
 
 	~Server();
 
-	void createTread(int remote_sock,  int ml_sock, sockaddr_in &remote_sock_addr);
+	void createTread(int remote_sock, sockaddr_in &remote_sock_addr);
 
-	int acceptConnection(int sock, sockaddr_in &remote_sock_addr);
+	int acceptConnection(sockaddr_in &remote_sock_addr);
 
 	int createSock(const char* ip, int port);
 
-	void setListenSock(int sock);
+	void sendMap();
 
-	void setMulticastSock(int sock);
-
-	void acceptToMulticastSocket(int sock);
-
-	void observeMap();
+	void notifyMap();
+	
+	void initMulticast();
 
 private:
-	const int SOCK_PORT = 8088;
-	const char *SOCK_IP = "0.0.0.0";
+	const int TCP_PORT = 8088;
+	const int UDP_PORT = 8182;
+	const char *ANY_IP = "0.0.0.0";
+	const char *MULTICAST_IP = "229.0.0.80";
+	int multicast_sock;
+	sockaddr_in multicast_addr;
 	int listen_sock;
-	std::mutex mult_mutex;
+
 	std::thread observer_thread;
 	std::vector<RemoteClientManager*> clients;
-	std::vector<int> remote_sockets;
 	int thread_id;
 	Field field;
-	int multicast_sock;
-
 };
 
 #endif

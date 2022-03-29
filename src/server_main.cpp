@@ -21,31 +21,21 @@ int main()
         }
     }};
     t1.detach();
-    const char ip[] = "0.0.0.0";
-	Server s;
-    sockaddr_in sock_addr_m;
-    sockaddr_in sock_addr_l;
-    int remote_m_sock;
-    int remote_l_sock;
-    int listen_s = s.createSock(ip,8088);
-    int multicast_s = s.createSock(ip,8089);
 
-    s.setListenSock(listen_s);
-    s.setMulticastSock(multicast_s);
+	Server server;
+    sockaddr_in sock_addr;
+    int remote_sock;
     bool flag = true;
     while(can_work)
     {
-        memset(&sock_addr_m, 0, sizeof(sock_addr_m));
-        memset(&sock_addr_l, 0, sizeof(sock_addr_l));
-        remote_l_sock = s.acceptConnection(listen_s, sock_addr_l);
-        remote_m_sock = s.acceptConnection(multicast_s, sock_addr_m);
-        s.acceptToMulticastSocket(remote_m_sock);
-        s.createTread(remote_l_sock, remote_m_sock, sock_addr_l);
+        memset(&sock_addr, 0, sizeof(sock_addr));
+        remote_sock = server.acceptConnection(sock_addr);
+        server.createTread(remote_sock, sock_addr);
         if(flag)
         {
-            s.observeMap();
+            server.notifyMap();
             flag = false;
         }
     }
-
+    return 0;
 }

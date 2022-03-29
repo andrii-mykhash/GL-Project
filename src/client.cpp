@@ -3,61 +3,13 @@
 
 #include "../inc/client.h"
 #include "../inc/json_wrapper.hpp"
+#include <errno.h>
 
-Client::Client(std::string ip, const int port)
+Client::Client(std::string ip)
 {
-    server_sock = connectToServer(ip,8088);
-
-
-    multicast_sock = connectToServer(ip,8089);
-    ret = recv(server_sock, &id, sizeof(id), 0);
-    if (ret != sizeof(id))
-    {
-        int err = errno;
-        std::string str = "recv: id - ";
-        str.append(std::to_string(ret))
-            .append(" != 4 - sizeof(int)\n strerror= ").append(strerror(err));
-        throw std::runtime_error(str);
-    }
-    initTTY();
-    map_tread = std::thread([&]
-    {
-        while(move_char != 'q')
-        {
-            // usleep(300);
-            sleep(1);
-            recvMap();
-            draw();
-            *tty << "Move - w/a/s/d; Quit - q: ";
-            tty->flush();
-        }
-    });
-}
-
-Client::~Client()
-{
-    if (shutdown(multicast_sock, SHUT_RDWR) != 0)
-    {
-        fprintf(stderr,"socket shutdown failed");
-    }
-    close(multicast_sock);
-    if(map_tread.joinable())
-    {
-        map_tread.join();
-    }
-    if (shutdown(server_sock, SHUT_RDWR) != 0)
-    {
-        fprintf(stderr,"socket shutdown failed");
-    }
-    close(server_sock);
-}
-
-int Client::connectToServer(std::string ip, const int port)
-{
-    int sock;
     sockaddr_in serv_addr;
-
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    int rec = 0;
+    if ((server_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         int err = errno;
         std::string str = "socket: strerror= ";
@@ -65,7 +17,7 @@ int Client::connectToServer(std::string ip, const int port)
         throw std::runtime_error(str);
     }
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
+    serv_addr.sin_port = htons(TCP_PORT);
 
     if (inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr) <= 0)
     {
@@ -75,37 +27,130 @@ int Client::connectToServer(std::string ip, const int port)
         throw std::runtime_error(str);
     }
 
-    if (connect(sock, (sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+    if (connect(server_sock, (sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     {
         int err = errno;
         std::string str = "connect: strerror= ";
         str.append(strerror(err));
         throw std::runtime_error(str);
     }
-    return sock;
-}
 
-
-
-int Client::recvMap()
-{
-    std::lock_guard<std::mutex> lock(map_mutex);
-    cbor_data.clear();
-    size_t buffer_size = 0;
-    ret = recv(multicast_sock, &buffer_size, sizeof(buffer_size), 0);
-
-    cbor_data.resize(buffer_size);
-    ret = recv(multicast_sock, cbor_data.data(), buffer_size, 0);
-    if ((size_t)ret != buffer_size)
+    rec = recv(server_sock, &id, sizeof(id), 0);
+    if (rec != sizeof(id))
     {
-        fprintf(stderr,"corrupted json length error: ret - %d != %lu - buffer_size", ret, buffer_size);
-        return -1;
+        int err = errno;
+        std::string str = "recv: id - ";
+        str.append(std::to_string(rec))
+            .append(" != 4 - sizeof(int)\n strerror= ").append(strerror(err));
+        throw std::runtime_error(str);
     }
-    users = json_to_map(cbor_data);
-    return 0;
+    initTTY();
+    setupMulticast();
 }
 
-bool Client::isMovableChar(char move_offset)
+Client::~Client()
+{
+    if(map_tread.joinable())
+    {
+        map_tread.join();
+    }
+    if (shutdown(server_sock, SHUT_RDWR) != 0)
+    {
+        int err = errno;
+        fprintf(stderr,"server_sock socket shutdown failed: errno=%i, str=\'%s\'\n",err, strerror(err));
+    }
+    close(server_sock);
+    close(multicast_sock);
+}
+
+void Client::setupMulticast()
+{
+    multicast_sock = socket(AF_INET, SOCK_DGRAM,0);
+    int one = 1, ret = 0;
+    socklen_t sock_len;
+    char ttl = 5;
+    ip_mreq multicast;
+
+    ret = setsockopt(multicast_sock, SOL_SOCKET, SO_REUSEADDR,
+		    (const void *)(&one), sizeof(one));
+    if(ret == -1){ printf("error: SOL_SOCKET, SO_REUSEADDR");}
+
+    memset(&multicast_addr, 0, sizeof(multicast_addr));
+    multicast_addr.sin_family = AF_INET;
+    multicast_addr.sin_port = htons(UDP_PORT);
+    multicast_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    sock_len = sizeof(multicast_addr);
+    
+    ret = bind(multicast_sock, (sockaddr*)&multicast_addr, sock_len);
+    if(ret == -1){ printf("set_mult1:  bind(multicast_sock)");}
+
+    multicast.imr_interface.s_addr = inet_addr("0.0.0.0");
+    multicast.imr_multiaddr.s_addr = inet_addr(MULTICAST_IP);
+
+    ret = setsockopt(multicast_sock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl));
+    if(ret == -1){ printf("set_mult2:  IPPROTO_IP, IP_MULTICAST_TTL");}
+    ret = setsockopt(multicast_sock, IPPROTO_IP,
+        IP_ADD_MEMBERSHIP, &multicast, sizeof(multicast));
+    if(ret == -1){ printf("set_mult3: IPPROTO_IP, IP_ADD_MEMBERSHIP");}
+
+}
+
+void Client::createRecvMapThread()
+{
+    map_tread = std::thread([&](){
+        while(1)
+        {
+            sleep(1);
+            recvMap();
+            if(move_char == 'q')
+            { 
+                break;
+            }
+            draw();
+            *tty << "Move - w/a/s/d; Quit - q: ";
+            tty->flush();
+        }
+        *tty << '\n';
+        tty->flush();
+    });
+}
+
+void Client::recvMap()
+{
+    size_t buff_size = 0;
+    int rec = 0;
+    socklen_t sock_len = sizeof(multicast_addr);
+    cbor_data.clear();
+
+    rec = recvfrom(multicast_sock, &buff_size, sizeof(buff_size), 0,
+                (sockaddr *)&multicast_addr, &sock_len);
+    if (rec == -1){
+		int err = errno;
+		fprintf(stderr, "recvMap1. Error: errno=%i, str: %s\n", err, strerror(err));
+	}
+    cbor_data.resize(buff_size);
+
+    rec = recvfrom(multicast_sock, cbor_data.data(), buff_size, 0,
+                (sockaddr *)&multicast_addr, &sock_len);
+    if (rec == -1){
+		int err = errno;
+		fprintf(stderr, "recvMap2. Error: errno=%i, str: %s\n", err, strerror(err));
+	}
+    if((size_t)rec != buff_size)
+    {
+        fprintf(stderr,"recvMap3. rec != buff_size: %i != %lu\n", rec, buff_size);
+    }
+    std::lock_guard<std::mutex> lock(map_mutex);
+    try{
+        users = json_to_map(cbor_data);
+    }catch(...)
+    {
+        users.clear();
+    }
+}
+
+bool Client::isMovableChar(char move_offset) const
 {
     return (move_offset == ComandKeys::W)
                ? false : (move_offset == ComandKeys::A)
@@ -140,16 +185,17 @@ void Client::draw()
 
 void Client::printAllUsers()
 {
+    int i = 1;
     for (auto it = users.cbegin(); it != users.cend(); ++it)
     {
         if (it->first == id)
         {
-            *tty << it->first << ")\t" << CYAN << it->second.coords.x << "x"
+            *tty << i++ << ")\t" << CYAN << it->second.coords.x << "x"
                  << it->second.coords.y << ":\t" << it->second.ip << "\n"
                  << RESET;
             continue;
         }
-        *tty << it->first << ")\t" << it->second.coords.x << "x"
+        *tty << i++ << ")\t" << it->second.coords.x << "x"
              << it->second.coords.y << ":\t" << it->second.ip << "\n";
     }
 }

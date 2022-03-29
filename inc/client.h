@@ -10,26 +10,25 @@
 #include <memory>
 #include <thread>
 #include <atomic>
+#include <netinet/in.h>
 
-const int PORT = 8088;
+
 
 class Client
 {
 public:
-    Client(std::string ip, const int port);
+    Client(std::string ip);
     
     ~Client();
 
-    int recvMap();
+    void createRecvMapThread();
 
-    void draw();
-
-    bool isMovableChar(char move_offset);
+    bool isMovableChar(char move_offset) const;
 
     void sendMoveDirection(char move_offset);
 
 private:
-    int connectToServer(std::string ip, const int port);
+    void draw();
 
     void initTTY();
 
@@ -37,19 +36,28 @@ private:
 
     void drawField();
 
+    void setupMulticast();
+
+    void recvMap();
+
+
 private:
     int server_sock;
     int multicast_sock;
-    int ret;
+    sockaddr_in multicast_addr;
+	const char *MULTICAST_IP = "229.0.0.80";
+    const int TCP_PORT = 8088;
+    const int UDP_PORT = 8182;
+
     int id;
     std::atomic<char> move_char;
     std::thread map_tread;
-    std::mutex map_writer_mutex;
+    std::mutex map_mutex;
+    
     User currend_user;
     std::map<int, User> users;
     std::vector<std::uint8_t> cbor_data;
     std::unique_ptr<std::fstream> tty;
-    std::mutex map_mutex;
 
     enum ComandKeys
     {

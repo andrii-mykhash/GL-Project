@@ -53,7 +53,7 @@ std::map<int,User> json_to_map(std::vector<std::uint8_t> bin_json)
     try{
         deserialize = nlohmann::json::from_cbor(bin_json.begin(),bin_json.end(),false,true);
     }catch(nlohmann::json::parse_error& e){
-        std::cout << e.what() << "\nid-"<<  e.id << "\nbyte-" << e.byte << std::endl;
+        std::cout << e.what() << "\nid - "<<  e.id << "\nbyte - " << e.byte << std::endl;
     }
     std::map<std::string, User> temp = deserialize;
     std::map<int, User> output;
