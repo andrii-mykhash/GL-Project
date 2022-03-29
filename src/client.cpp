@@ -205,7 +205,7 @@ void Client::drawField()
     /*
         Output field that have got 80x24 dimention and contain all curent users
     */
-    char paint[80][24] = {'\0'};
+    char paint[FIELD_WIDTH][FIELD_HEIGHT] = {'\0'};
     for (auto it = users.cbegin(); it != users.cend(); ++it)
     {
         if (it->first == id)
@@ -217,16 +217,16 @@ void Client::drawField()
     }
 
     *tty << "+";
-    for (int i = 0; i < 80; i++)
+    for (int i = 0; i < FIELD_WIDTH; i++)
     {
         *tty << "-";
     }
     *tty << "+\n";
 
-    for (int y = 0; y < 24; y++)
+    for (int y = 0; y < FIELD_HEIGHT; y++)
     {
         *tty << "|";
-        for (int x = 0; x < 80; x++)
+        for (int x = 0; x < FIELD_WIDTH; x++)
         {
             if (paint[x][y] == '\0')
             {
@@ -248,7 +248,7 @@ void Client::drawField()
     }
 
     *tty << "+";
-    for (int i = 0; i < 80; i++)
+    for (int i = 0; i < FIELD_WIDTH; i++)
     {
         *tty << "-";
     }

@@ -36,11 +36,11 @@ int RemoteClientManager::createUser(sockaddr_in &remote_sock_addr)
 
 bool RemoteClientManager::isCorrectChar(char to_verify)
 {
-    return(to_verify == 'w')
-               ? false : (to_verify == 'a')
-               ? false : (to_verify == 's')
-               ? false : (to_verify == 'd')
-               ? false : (to_verify == 'q')
+    return (to_verify == ComandKeys::W)
+               ? false : (to_verify == ComandKeys::A)
+               ? false : (to_verify == ComandKeys::S)
+               ? false : (to_verify == ComandKeys::D)
+               ? false : (to_verify == ComandKeys::Q)
                ? false : true;
 }
 
@@ -72,29 +72,29 @@ void RemoteClientManager::move(char move_direction, User &to_move)
 
     case 's':
         to_move.coords.y++;
-        to_move.coords.y = (to_move.coords.y > 23) ? 0 
-                        : (to_move.coords.y < 0) ? 23
+        to_move.coords.y = (to_move.coords.y > (FIELD_HEIGHT-1)) ? 0 
+                        : (to_move.coords.y < 0) ? (FIELD_HEIGHT-1)
                         : to_move.coords.y;
         return;
 
     case 'a':
         to_move.coords.x--;
-        to_move.coords.x = (to_move.coords.x > 79) ? 0
-                        : (to_move.coords.x < 0) ? 79
+        to_move.coords.x = (to_move.coords.x > (FIELD_WIDTH-1)) ? 0
+                        : (to_move.coords.x < 0) ? (FIELD_WIDTH-1)
                         : to_move.coords.x;
         return;
 
     case 'w':
         to_move.coords.y--;
-        to_move.coords.y = (to_move.coords.y > 23) ? 0 
-                        : (to_move.coords.y < 0) ? 23
+        to_move.coords.y = (to_move.coords.y > (FIELD_HEIGHT-1)) ? 0 
+                        : (to_move.coords.y < 0) ? (FIELD_HEIGHT-1)
                         : to_move.coords.y;
         return;
 
     case 'd':
         to_move.coords.x++;
-        to_move.coords.x = (to_move.coords.x > 79) ? 0 
-                        : (to_move.coords.x < 0) ? 79
+        to_move.coords.x = (to_move.coords.x > (FIELD_WIDTH-1)) ? 0 
+                        : (to_move.coords.x < 0) ? (FIELD_WIDTH-1)
                         : to_move.coords.x;
 
         return;

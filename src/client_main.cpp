@@ -10,7 +10,7 @@ int main()
     Client us(ip_str);
     us.createRecvMapThread();
     unsigned char move_offset = '\0';
-    std::cout << "\e[8;35;82t";
+    std::cout << "\e[8;35;80t";
     while (1)
     {
         do

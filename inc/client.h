@@ -11,7 +11,7 @@
 #include <thread>
 #include <atomic>
 #include <netinet/in.h>
-
+#include "both_data.h"
 
 
 class Client
@@ -58,15 +58,6 @@ private:
     std::map<int, User> users;
     std::vector<std::uint8_t> cbor_data;
     std::unique_ptr<std::fstream> tty;
-
-    enum ComandKeys
-    {
-        A = 'a',
-        D = 'd',
-        Q = 'q',
-        S = 's',
-        W = 'w'
-    };
 
     const char *CYAN = "\033[0;36m";
     const char *RESET = "\033[0m";
