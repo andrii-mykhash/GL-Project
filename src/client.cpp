@@ -101,7 +101,7 @@ void Client::createRecvMapThread()
     map_tread = std::thread([&](){
         while(1)
         {
-            sleep(1);
+            usleep(130000);
             recvMap();
             if(move_char == 'q')
             { 

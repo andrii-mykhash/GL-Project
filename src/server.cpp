@@ -144,7 +144,7 @@ void Server::notifyMap()
 	{
 		while (1)
 		{	
-			sleep(1);
+            usleep(130000);
 			sendMap();
 		}
 	});
