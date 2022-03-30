@@ -1,4 +1,4 @@
-#include "dot_test.h"
+#include "inc/dot_test.h"
 
 void DotTest::setUp()
 {

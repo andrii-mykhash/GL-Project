@@ -1,5 +1,5 @@
-#include "json_wrapper_test.h"
-#include "../inc/json_wrapper.hpp"
+#include "inc/json_wrapper_test.h"
+#include "json_wrapper.hpp"
 
 void JsonWrapperTest::testConvertToJsonCBOR()
 {

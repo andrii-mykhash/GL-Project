@@ -1,4 +1,4 @@
-#include "../inc/field.h"
+#include "field.h"
 
 #include <unistd.h>
 #include <algorithm>

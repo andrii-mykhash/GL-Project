@@ -1,10 +1,13 @@
 #ifndef GL_JSON_PARSER_HPP
 #define GL_JSON_PARSER_HPP
+
 #include "user.hpp"
-#include <map>
 #include "json.hpp"
+
+#include <map>
 #include <vector> 
 #include <iostream>
+
 void to_json(nlohmann::json &j, const User &u)
 {
     /*

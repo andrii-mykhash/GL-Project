@@ -1,4 +1,5 @@
-#include "../inc/server.h"
+#include "../inc/server/server.h"
+
 #include <cstring>
 #include <iostream>
 #include <atomic>

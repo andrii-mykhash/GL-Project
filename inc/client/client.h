@@ -1,18 +1,18 @@
 #ifndef GL_CLIENT_H
 #define GL_CLIENT_H
 
+#include "user.hpp"
+#include "both_data.h"
+
 #include <string>
 #include <map>
 #include <vector>
 #include <mutex>
-#include "user.hpp"
 #include <fstream>
 #include <memory>
 #include <thread>
 #include <atomic>
 #include <netinet/in.h>
-#include "both_data.h"
-
 
 class Client
 {

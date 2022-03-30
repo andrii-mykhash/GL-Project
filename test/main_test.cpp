@@ -1,3 +1,7 @@
+#include "inc/dot_test.h"
+#include "inc/field_test.h"
+#include "inc/json_wrapper_test.h"
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/TestResult.h>
 #include <cppunit/TestResultCollector.h>
@@ -6,10 +10,6 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TextTestRunner.h>
-
-#include "dot_test.h"
-#include "field_test.h"
-#include "json_wrapper_test.h"
 
 CPPUNIT_TEST_SUITE_REGISTRATION( DotTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( FieldTest );

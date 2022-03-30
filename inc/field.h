@@ -3,13 +3,13 @@
 
 #include "dot.h"
 #include "user.hpp"
+#include "both_data.h"
 
 #include <map>
 #include <string>
 #include <random>
 #include <fstream>
 #include <mutex>
-#include "both_data.h"
 
 class Field
 {

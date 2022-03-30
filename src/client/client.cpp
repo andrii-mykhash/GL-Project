@@ -1,8 +1,8 @@
+#include "client/client.h"
+#include "json_wrapper.hpp"
+
 #include <arpa/inet.h>
 #include <unistd.h>
-
-#include "../inc/client.h"
-#include "../inc/json_wrapper.hpp"
 #include <errno.h>
 
 Client::Client(std::string ip)

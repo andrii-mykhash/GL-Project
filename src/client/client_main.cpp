@@ -1,5 +1,6 @@
+#include "client/client.h"
+
 #include <iostream>
-#include "../inc/client.h"
 
 int main()
 {

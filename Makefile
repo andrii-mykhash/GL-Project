@@ -2,6 +2,8 @@ CXX_FLAGS = -std=c++20 -g -Wall -Iinc -pthread
 SRC = src
 BUILD = build
 TEST = test
+SERVER = $(SRC)/server
+CLIENT = $(SRC)/client
 CC = g++-10
 
 .Phony: all build clear test sc
@@ -27,26 +29,26 @@ field.o: $(SRC)/field.cpp dot.o
 
 #-----------ServerClient------
 
-server.o: $(SRC)/server.cpp
-	$(CC) $(CXX_FLAGS) $(SRC)/server.cpp -c
+server.o: $(SERVER)/server.cpp
+	$(CC) $(CXX_FLAGS) $(SERVER)/server.cpp -c
 	mv server.o $(BUILD)/
 
-remote_client_manager.o: $(SRC)/remote_client_manager.cpp
-	$(CC) $(CXX_FLAGS) $(SRC)/remote_client_manager.cpp -c
+remote_client_manager.o: $(SERVER)/remote_client_manager.cpp
+	$(CC) $(CXX_FLAGS) $(SERVER)/remote_client_manager.cpp -c
 	mv remote_client_manager.o $(BUILD)/
 
-server_main: field.o server.o remote_client_manager.o $(SRC)/server_main.cpp
-	$(CC) $(CXX_FLAGS) $(SRC)/server_main.cpp -o server_main \
+server_main: field.o server.o remote_client_manager.o $(SERVER)/server_main.cpp
+	$(CC) $(CXX_FLAGS) $(SERVER)/server_main.cpp -o server_main \
 	$(BUILD)/dot.o $(BUILD)/field.o $(BUILD)/server.o  $(BUILD)/remote_client_manager.o
 	mv server_main $(BUILD)/
 
-client.o: $(SRC)/client.cpp
-	$(CC) $(CXX_FLAGS) $(SRC)/client.cpp -c
+client.o: $(CLIENT)/client.cpp
+	$(CC) $(CXX_FLAGS) $(CLIENT)/client.cpp -c
 	mv client.o $(BUILD)/
 
 
-client_main: field.o client.o $(SRC)/client_main.cpp
-	$(CC) $(CXX_FLAGS) $(SRC)/client_main.cpp -o client_main \
+client_main: field.o client.o $(CLIENT)/client_main.cpp
+	$(CC) $(CXX_FLAGS) $(CLIENT)/client_main.cpp -o client_main \
 	$(BUILD)/dot.o $(BUILD)/field.o $(BUILD)/client.o
 	mv client_main $(BUILD)/
 

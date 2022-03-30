@@ -2,10 +2,10 @@
 #define GL_SERVER_H
 
 #include "field.h"
+#include "remote_client_manager.h"
 
 #include <arpa/inet.h>
 #include <thread>
-#include "remote_client_manager.h"
 #include <mutex>
 
 class Server

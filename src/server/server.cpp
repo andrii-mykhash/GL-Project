@@ -1,10 +1,10 @@
-#include "../inc/server.h"
+#include "server/server.h"
+#include "json_wrapper.hpp"
 
 #include <cstring>
 #include <errno.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include "../inc/json_wrapper.hpp"
 #include <algorithm>
 #include <errno.h>
 

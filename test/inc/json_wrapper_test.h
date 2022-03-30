@@ -1,7 +1,8 @@
 #ifndef GL_JSON_WRAPPER_TEST_H
 #define GL_JSON_WRAPPER_TEST_H
 
-#include "../inc/user.hpp"
+#include "user.hpp"
+
 #include <cppunit/TestCase.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestFixture.h>

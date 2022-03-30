@@ -1,7 +1,8 @@
 #ifndef GL_DOT_TEST_H
 #define GL_DOT_TEST_H
 
-#include "../inc/dot.h"
+#include "dot.h"
+
 #include <cppunit/TestCase.h>
 #include <cppunit/extensions/HelperMacros.h>
 

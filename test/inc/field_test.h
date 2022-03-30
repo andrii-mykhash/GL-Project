@@ -1,7 +1,8 @@
 #ifndef GL_FIELD_TEST_H
 #define GL_FIELD_TEST_H
 
-#include "../inc/field.h"
+#include "field.h"
+
 #include <cppunit/TestCase.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestFixture.h>

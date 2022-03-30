@@ -2,6 +2,7 @@
 #define GL_RC_MANAGER_H
 
 #include "field.h"
+
 #include <arpa/inet.h>
 #include <thread>
 

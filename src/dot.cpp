@@ -1,4 +1,4 @@
-#include "../inc/dot.h"
+#include "dot.h"
 
 std::weak_ordering Dot::operator<=>(const Dot &to_verify) const
 {

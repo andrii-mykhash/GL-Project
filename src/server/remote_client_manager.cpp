@@ -1,4 +1,5 @@
-#include "../inc/remote_client_manager.h"
+#include "server/remote_client_manager.h"
+
 #include <unistd.h>
 #include <string.h>
 
