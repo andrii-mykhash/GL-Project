@@ -19,7 +19,7 @@ int main()
             std::cin >> move_offset;
         } while (us.isMovableChar(move_offset));
         us.sendMoveDirection(move_offset);
-        if(move_offset == 'q'){ break; }
+        if(move_offset == ComandKeys::EXIT){ break; }
         move_offset = '\0';
     }
     std::cout << "\e[8;24;80t";

@@ -1,12 +1,13 @@
 #ifndef GL_BOTH_DATA_H
 #define GL_BOTH_DATA_H
-enum ComandKeys
+
+enum ComandKeys : char
 {
-    A = 'a',
-    D = 'd',
-    Q = 'q',
-    S = 's',
-    W = 'w'
+    LEFT = 'a',
+    RIGHT = 'd',
+    EXIT = 'q',
+    DOWN = 's',
+    UP = 'w'
 };
 
 const int FIELD_WIDTH = 78;

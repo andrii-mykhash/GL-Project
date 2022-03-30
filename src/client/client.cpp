@@ -103,7 +103,7 @@ void Client::createRecvMapThread()
         {
             usleep(130000);
             recvMap();
-            if(move_char == 'q')
+            if(move_char == ComandKeys::EXIT)
             { 
                 break;
             }
@@ -152,11 +152,11 @@ void Client::recvMap()
 
 bool Client::isMovableChar(char move_offset) const
 {
-    return (move_offset == ComandKeys::W)
-               ? false : (move_offset == ComandKeys::A)
-               ? false : (move_offset == ComandKeys::S)
-               ? false : (move_offset == ComandKeys::D)
-               ? false : (move_offset == ComandKeys::Q)
+    return (move_offset == ComandKeys::UP)
+               ? false : (move_offset == ComandKeys::LEFT)
+               ? false : (move_offset == ComandKeys::DOWN)
+               ? false : (move_offset == ComandKeys::RIGHT)
+               ? false : (move_offset == ComandKeys::EXIT)
                ? false : true;
 }
 
