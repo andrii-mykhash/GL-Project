@@ -27,7 +27,7 @@ field.o: $(SRC)/field.cpp dot.o
 	$(CC) $(CXX_FLAGS) -c $(SRC)/field.cpp 
 	mv field.o $(BUILD)/
 
-#-----------ServerClient------
+#-----------Server------------
 
 server.o: $(SERVER)/server.cpp
 	$(CC) $(CXX_FLAGS) $(SERVER)/server.cpp -c
@@ -42,21 +42,26 @@ server_main: field.o server.o remote_client_manager.o $(SERVER)/server_main.cpp
 	$(BUILD)/dot.o $(BUILD)/field.o $(BUILD)/server.o  $(BUILD)/remote_client_manager.o
 	mv server_main $(BUILD)/
 
+#-----------Client------------
+
+field_drawer.o: $(CLIENT)/field_drawer.cpp
+	$(CC) $(CXX_FLAGS) $(CLIENT)/field_drawer.cpp -c
+	mv field_drawer.o $(BUILD)/
+
 client.o: $(CLIENT)/client.cpp
 	$(CC) $(CXX_FLAGS) $(CLIENT)/client.cpp -c
 	mv client.o $(BUILD)/
 
-
-client_main: field.o client.o $(CLIENT)/client_main.cpp
+client_main: field.o field_drawer.o client.o $(CLIENT)/client_main.cpp
 	$(CC) $(CXX_FLAGS) $(CLIENT)/client_main.cpp -o client_main \
-	$(BUILD)/dot.o $(BUILD)/field.o $(BUILD)/client.o
+	$(BUILD)/dot.o $(BUILD)/field.o $(BUILD)/field_drawer.o $(BUILD)/client.o
 	mv client_main $(BUILD)/
 
 sc: client_main server_main
 
 #------------ Test -----------
  
-test: mkdir_test dot_test.o field_test.o json_wrapper_test.o $(BUILD)/field.o
+test: mkdir_test dot_test.o field_test.o json_wrapper_test.o
 	$(CC) $(CXX_FLAGS) $(BUILD)/dot.o $(BUILD)/field.o \
 	$(BUILD)/$(TEST)/dot_test.o $(BUILD)/$(TEST)/field_test.o \
 	$(BUILD)/$(TEST)/json_wrapper_test.o $(TEST)/main_test.cpp \
