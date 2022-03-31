@@ -6,49 +6,6 @@
 #include <errno.h>
 #include <map>
 
-// Client::Client(std::string ip)
-// {
-//     sockaddr_in serv_addr;
-//     int rec = 0;
-//     if ((server_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-//     {
-//         int err = errno;
-//         std::string str = "socket: strerror= ";
-//         str.append(strerror(err));
-//         throw std::runtime_error(str);
-//     }
-//     serv_addr.sin_family = AF_INET;
-//     serv_addr.sin_port = htons(TCP_PORT);
-
-//     if (inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr) <= 0)
-//     {
-//         int err = errno;
-//         std::string str = "inet_pton: invalid address, strerror= ";
-//         str.append(strerror(err));
-//         throw std::runtime_error(str);
-//     }
-
-//     if (connect(server_sock, (sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-//     {
-//         int err = errno;
-//         std::string str = "connect: strerror= ";
-//         str.append(strerror(err));
-//         throw std::runtime_error(str);
-//     }
-//     int id;
-//     rec = recv(server_sock, &id, sizeof(id), 0);
-//     if (rec != sizeof(id))
-//     {
-//         int err = errno;
-//         std::string str = "recv: id - ";
-//         str.append(std::to_string(rec))
-//             .append(" != 4 - sizeof(int)\n strerror= ").append(strerror(err));
-//         throw std::runtime_error(str);
-//     }
-//     f_drawer.init(id);
-
-// }
-
 int Client::init(std::string ip)
 {
     int rec = 0;
@@ -79,7 +36,7 @@ int Client::connectToServer(std::string ip)
     // int rec = 0;
     if ((server_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-        return NetworkError::SOCKET_CREATION;
+        return NetworkError::SOCKET_NOT_CREATED;
         // int err = errno;
         // std::string str = "socket: strerror= ";
         // str.append(strerror(err));
@@ -161,7 +118,7 @@ void Client::createRecvMapThread()
     map_tread = std::thread([&](){
         while(1)
         {
-            usleep(130000);
+            usleep(100000);
             f_drawer.setMap(recvMap());
             if(move_char == ComandKeys::EXIT)
             { 

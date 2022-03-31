@@ -11,30 +11,34 @@
 class Server
 {
 public:
-	Server();
+	// Server();
 
 	~Server();
+
+	int init(char ttl_number);
 
 	void createTread(int remote_sock, sockaddr_in &remote_sock_addr);
 
 	int acceptConnection(sockaddr_in &remote_sock_addr);
 
-	int createSock(const char* ip, int port);
-
+private:
 	void sendMap();
 
 	void notifyMap();
+
+	int initServer();
 	
-	void initMulticast();
+	int initMulticast(char ttl_number);
 
 private:
 	const int TCP_PORT = 8088;
 	const int UDP_PORT = 8182;
-	const char *ANY_IP = "0.0.0.0";
-	const char *MULTICAST_IP = "229.0.0.80";
+	inline static const char *ANY_IP = "0.0.0.0";
+	inline static const char *MULTICAST_IP = "229.0.0.80";
 	int multicast_sock;
 	sockaddr_in multicast_addr;
 	int listen_sock;
+	std::atomic_bool can_share_map;
 
 	std::thread observer_thread;
 	std::vector<RemoteClientManager*> clients;

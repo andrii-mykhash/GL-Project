@@ -15,7 +15,7 @@ int main()
         {
             if (s == "exit" || s == "q")
             {
-                std::cout << "\nexit command given on stdin\nclossing...";
+                std::cout << "\nexit command given on stdin\nclossing...\n";
                 can_work = false;
                 break;
             }		
@@ -24,19 +24,26 @@ int main()
     t1.detach();
 
 	Server server;
+    
+    {
+        int ret_code;
+        if((ret_code = server.init((char)1)) != 0)
+        {
+            return ret_code;
+        }
+    }
     sockaddr_in sock_addr;
     int remote_sock;
-    bool flag = true;
+
     while(can_work)
     {
         memset(&sock_addr, 0, sizeof(sock_addr));
         remote_sock = server.acceptConnection(sock_addr);
-        server.createTread(remote_sock, sock_addr);
-        if(flag)
+        if(remote_sock < 0)
         {
-            server.notifyMap();
-            flag = false;
+            continue;
         }
+        server.createTread(remote_sock, sock_addr);
     }
     return 0;
 }

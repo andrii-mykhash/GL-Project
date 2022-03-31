@@ -8,16 +8,26 @@
 #include <algorithm>
 #include <errno.h>
 
-Server::Server()
+int Server::init(char ttl_number)
 {
+	can_share_map = true;
 	thread_id = 0;
+	int ret = 0;
+	if((ret = initServer()) < 0){
+		return ret;
+	}
+
+	initMulticast(ttl_number);
+	notifyMap();
+	return 0;
+}
+
+int Server::initServer()
+{
 	listen_sock = socket(AF_INET, SOCK_STREAM, 0); 
 	if (listen_sock < 0)
 	{
-		int err = errno;
-        std::string str = "Server() socket: strerror=";
-        str.append(std::to_string(err)).append(": ").append(strerror(err));
-        throw std::runtime_error(str);
+		return -1;
 	}
 
 	sockaddr_in listen_sock_addr;
@@ -29,23 +39,18 @@ Server::Server()
 	if (bind(listen_sock, (sockaddr *)&listen_sock_addr,
 			 sizeof(listen_sock_addr)) == -1)
 	{
-		int err = errno;
-        std::string str = "Server() bind: strerror=";
-        str.append(std::to_string(err)).append(": ").append(strerror(err));
-        throw std::runtime_error(str);
+		return -2;
 	}
 
 	if (listen(listen_sock, 1) < 0)
 	{
-		int err = errno;
-        std::string str = "Server() listen: strerror=";
-        str.append(std::to_string(err)).append(": ").append(strerror(err));
-        throw std::runtime_error(str);
+		return -3;
 	}
-	initMulticast();
+	return 0;
 }
 
-void Server::initMulticast()
+
+int Server::initMulticast(char ttl_number)
 {
 	multicast_sock = socket(AF_INET, SOCK_DGRAM, 0);
 
@@ -54,7 +59,6 @@ void Server::initMulticast()
     multicast_addr.sin_port = htons(UDP_PORT);
     multicast_addr.sin_addr.s_addr = inet_addr(MULTICAST_IP);
 	
-    char ttl = 1;
     ip_mreq multicast;	
     multicast.imr_interface.s_addr = inet_addr(ANY_IP);
     multicast.imr_multiaddr.s_addr = inet_addr(MULTICAST_IP);
@@ -63,22 +67,27 @@ void Server::initMulticast()
 	{
 		int err = errno;
 		fprintf(stderr,"multicast_init: LOOP, errno=%i, str - %s\n", err, strerror(err));
+		return -1;
 	}
-	if(setsockopt(multicast_sock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl)) != 0)
+	if(setsockopt(multicast_sock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl_number, sizeof(ttl_number)) != 0)
 	{
 		int err = errno;
 		fprintf(stderr,"multicast_init: TTL, errno=%i, str - %s\n", err, strerror(err));
+		return -1;
 	}
     
 	if(setsockopt(multicast_sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, &multicast, sizeof(multicast)) != 0)
 	{
 		int err = errno;
 		fprintf(stderr,"multicast_init: MEMBERSHIP, errno=%i, str - %s\n", err, strerror(err));
+		return -1;
 	}
+	return 0;
 }
 
 Server::~Server()
 {	
+	can_share_map = false;
 	if(observer_thread.joinable())
 	{
 		observer_thread.join();
@@ -94,16 +103,27 @@ Server::~Server()
 
 int Server::acceptConnection(sockaddr_in &remote_sock_addr)
 {
+    fd_set readfds;
+    timeval time_out;
 	socklen_t length = sizeof(remote_sock_addr);
 	int remote_sock;
-	if ((remote_sock = accept(listen_sock, 
-			(sockaddr *)&remote_sock_addr, &length)) < 0)
-	{
-		int err = errno;
-		fprintf(stderr,"accept: strerror=%d: %s \n", err, strerror(err));
+	time_out.tv_sec = 5;
+	time_out.tv_usec = 0;
+
+	FD_ZERO(&readfds);
+	FD_SET(listen_sock, &readfds);
+	remote_sock = select((listen_sock + 1) , &readfds , NULL , NULL , &time_out);
+	if(remote_sock > 0)
+	{ 
+		if ((remote_sock = accept(listen_sock, 
+				(sockaddr *)&remote_sock_addr, &length)) < 0)
+		{ 
+			return -2; 
+		}
+		printf("new connection: fd=%d\n", remote_sock);
+		return remote_sock;
 	}
-	printf("new connection: fd=%d\n", remote_sock);
-	return remote_sock;
+	return -1;
 }
 
 void Server::sendMap()
@@ -131,14 +151,13 @@ void Server::sendMap()
 	}
 }
 
-
 void Server::notifyMap()
 {
 	observer_thread = std::thread([&]()
 	{
-		while (1)
+		while (can_share_map)
 		{	
-            usleep(130000);
+            usleep(100000);
 			sendMap();
 		}
 	});

@@ -15,7 +15,7 @@ enum NetworkError
 {
     CANNOT_CONNECT = -3,
     INVALID_ADDRESS = -2,
-    SOCKET_CREATION = -1
+    SOCKET_NOT_CREATED = -1
 };
 
 class Client

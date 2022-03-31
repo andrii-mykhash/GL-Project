@@ -21,8 +21,8 @@ void FieldDrawer::setMap(std::map<int, User> to_assign)
 
 void FieldDrawer::initTTY()
 {//                        /dev/stdout    /dev/tty
-    tty = std::make_unique<std::fstream>("/dev/stdout",
-            tty->in | tty->out | tty->trunc);
+    tty = std::make_unique<std::fstream>("/dev/stdout", std::ios::binary | std::ios::in | std::ios::out);
+            // tty->in | tty->out | tty->trunc);
     if (!tty->is_open())
     {
         throw std::runtime_error("tty open error");
@@ -34,7 +34,7 @@ void FieldDrawer::draw()
     *tty << FieldDrawer::CLEAR_TERMINAL_VALUE;
     printAllUsers();
     drawField();
-    *tty << "Move - w/a/s/d; Quit - q: ";
+    *tty << "\r[Move - w|a|s|d] [Quit - q]: ";
     tty->flush();
 }
 
@@ -45,14 +45,15 @@ void FieldDrawer::printAllUsers()
     {
         if (it->first == id)
         {
-            *tty << i++ << ")\t" << CYAN << it->second.coords.x << "x"
+            *tty << "\r" << i++ << ")\t" << CYAN << it->second.coords.x << "x"
                  << it->second.coords.y << ":\t" << it->second.ip << "\n"
                  << RESET;
             continue;
         }
-        *tty << i++ << ")\t" << it->second.coords.x << "x"
+        *tty << "\r" << i++ << ")\t" << it->second.coords.x << "x"
              << it->second.coords.y << ":\t" << it->second.ip << "\n";
     }
+    *tty << std::endl;
 }
 
 void FieldDrawer::drawField()
@@ -71,7 +72,7 @@ void FieldDrawer::drawField()
         paint[it->second.coords.x][it->second.coords.y] = '*';
     }
 
-    *tty << "+";
+    *tty << "\r+";
     for (int i = 0; i < FIELD_WIDTH; i++)
     {
         *tty << "-";
@@ -80,7 +81,7 @@ void FieldDrawer::drawField()
 
     for (int y = 0; y < FIELD_HEIGHT; y++)
     {
-        *tty << "|";
+        *tty << "\r|";
         for (int x = 0; x < FIELD_WIDTH; x++)
         {
             if (paint[x][y] == '\0')
@@ -102,7 +103,7 @@ void FieldDrawer::drawField()
         *tty << "|\n";
     }
 
-    *tty << "+";
+    *tty << "\r+";
     for (int i = 0; i < FIELD_WIDTH; i++)
     {
         *tty << "-";
