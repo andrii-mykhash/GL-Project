@@ -6,15 +6,11 @@ SERVER = $(SRC)/server
 CLIENT = $(SRC)/client
 CC = g++-10
 
-.Phony: all build clear test sc
+.Phony: all clear test sc
 
-all: build test sc
+all: test sc
 
 #------------ Build  -----------
-
-# build: mkdir dot.o field.o
-# 	# $(CC) $(CXX_FLAGS) $(SRC)/main.cpp -o main $(BUILD)/dot.o $(BUILD)/field.o
-# 	# mv main build/
 
 mkdir: 
 	mkdir -p build

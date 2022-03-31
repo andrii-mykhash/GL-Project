@@ -118,7 +118,7 @@ void Client::createRecvMapThread()
     map_tread = std::thread([&](){
         while(1)
         {
-            usleep(100000);
+            usleep(MICROSEC_WAIT);
             f_drawer.setMap(recvMap());
             if(move_char == ComandKeys::EXIT)
             { 

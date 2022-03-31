@@ -27,7 +27,7 @@ int Server::initServer()
 	listen_sock = socket(AF_INET, SOCK_STREAM, 0); 
 	if (listen_sock < 0)
 	{
-		return -1;
+		return NetworkError::SOCKET_NOT_CREATED;
 	}
 
 	sockaddr_in listen_sock_addr;
@@ -39,12 +39,12 @@ int Server::initServer()
 	if (bind(listen_sock, (sockaddr *)&listen_sock_addr,
 			 sizeof(listen_sock_addr)) == -1)
 	{
-		return -2;
+		return NetworkError::BIND_ERROR;
 	}
 
 	if (listen(listen_sock, 1) < 0)
 	{
-		return -3;
+		return NetworkError::LISTEN_ERROR;
 	}
 	return 0;
 }
@@ -157,7 +157,7 @@ void Server::notifyMap()
 	{
 		while (can_share_map)
 		{	
-            usleep(100000);
+            usleep(MICROSEC_WAIT);
 			sendMap();
 		}
 	});
