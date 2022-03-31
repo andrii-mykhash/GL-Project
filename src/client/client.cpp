@@ -33,14 +33,9 @@ int Client::init(std::string ip)
 int Client::connectToServer(std::string ip)
 {
     sockaddr_in serv_addr;
-    // int rec = 0;
     if ((server_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         return NetworkError::SOCKET_NOT_CREATED;
-        // int err = errno;
-        // std::string str = "socket: strerror= ";
-        // str.append(strerror(err));
-        // throw std::runtime_error(str);
     }
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(TCP_PORT);
@@ -48,19 +43,11 @@ int Client::connectToServer(std::string ip)
     if (inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr) <= 0)
     {
         return NetworkError::INVALID_ADDRESS;
-        // int err = errno;
-        // std::string str = "inet_pton: invalid address, strerror= ";
-        // str.append(strerror(err));
-        // throw std::runtime_error(str);
     }
 
     if (connect(server_sock, (sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     {
         return NetworkError::CANNOT_CONNECT;
-        // int err = errno;
-        // std::string str = "connect: strerror= ";
-        // str.append(strerror(err));
-        // throw std::runtime_error(str);
     }
     return 0;
 }

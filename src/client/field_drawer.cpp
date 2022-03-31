@@ -4,10 +4,12 @@
 FieldDrawer::~FieldDrawer()
 {
     *tty << FieldDrawer::RESET_TERMINAL_VALUE;
+    system("/bin/stty cooked");
 }
 
 void FieldDrawer::init(int _id)
 {
+    system("/bin/stty raw");
     id = _id;
     initTTY();
     *tty << FieldDrawer::EXPAND_TERMINAL_VALUE;
@@ -22,7 +24,6 @@ void FieldDrawer::setMap(std::map<int, User> to_assign)
 void FieldDrawer::initTTY()
 {//                        /dev/stdout    /dev/tty
     tty = std::make_unique<std::fstream>("/dev/stdout", std::ios::binary | std::ios::in | std::ios::out);
-            // tty->in | tty->out | tty->trunc);
     if (!tty->is_open())
     {
         throw std::runtime_error("tty open error");

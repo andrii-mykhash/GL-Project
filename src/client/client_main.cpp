@@ -42,7 +42,6 @@ int main()
 
 CONTINUE_WORK:
     unsigned char move_offset = '\0';
-    system("/bin/stty raw");
     while (1)
     {
         do
@@ -53,7 +52,6 @@ CONTINUE_WORK:
         if(move_offset == ComandKeys::EXIT){ break; }
         move_offset = '\0';
     }
-    system("/bin/stty cooked");
     std::cout << std::endl;
     return 0; 
 }
