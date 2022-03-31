@@ -7,7 +7,6 @@ RemoteClientManager::RemoteClientManager(int remote_sock,
         Field* field_r, int thread_id, sockaddr_in& addr) 
         : remote_socket(remote_sock), field(field_r), thread_id(thread_id)
 {
-    
     id = createUser(addr);
 }
 
@@ -20,17 +19,19 @@ void RemoteClientManager::closeConnection(int sock)
             %s thread_id=%d\n", error, strerror(error), thread_id);
     }
     close(sock);
-    printf("close connection: sock_fd=%d \n", sock);
+    printf("closed connection: sock_fd=%d \n", sock);
 }
 
 int RemoteClientManager::createUser(sockaddr_in &remote_sock_addr)
 {
     char str[INET_ADDRSTRLEN] = {0};
     inet_ntop(AF_INET, &(remote_sock_addr.sin_addr), str, INET_ADDRSTRLEN);
+
     std::string ip = str;
     ip.append(":");
     ip.append(std::to_string(ntohs(remote_sock_addr.sin_port)));
     id = field->createUser(std::string(ip));
+
     send(remote_socket, &id, sizeof(id), 0);
     return id;
 }
@@ -50,11 +51,15 @@ char RemoteClientManager::recvMoveDirection()
     char command_buffer;
     int ret = recv(remote_socket,
              &command_buffer, sizeof(command_buffer), 0);
+
     int error_code = 0;
-    socklen_t error_code_size = sizeof(error_code);;
-    int check = getsockopt(remote_socket, SOL_SOCKET, SO_ERROR, &error_code, &error_code_size);
-    printf("thread_id=%d\t\tret=%d\t\tbuff_char=%c\n", 
+    socklen_t error_code_size = sizeof(error_code);
+    int check = getsockopt(remote_socket, SOL_SOCKET, 
+            SO_ERROR, &error_code, &error_code_size);
+
+    printf("thread_id=%d\t ret=%d\t buff_char=%c\n", 
             thread_id, ret, command_buffer);
+
     if(check != 0 || ret == -1 || (ret == 0 && command_buffer == '\0'))
     {
         printf("%c, check=%i\n", ComandKeys::EXIT, check); 

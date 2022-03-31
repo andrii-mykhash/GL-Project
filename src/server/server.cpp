@@ -75,11 +75,10 @@ void Server::initMulticast()
 		int err = errno;
 		fprintf(stderr,"multicast_init: MEMBERSHIP, errno=%i, str - %s\n", err, strerror(err));
 	}
-    
 }
 
 Server::~Server()
-{
+{	
 	if(observer_thread.joinable())
 	{
 		observer_thread.join();
@@ -90,12 +89,7 @@ Server::~Server()
 		fprintf(stderr,"shutdow socket error, sock_fd=%d\n", listen_sock);
 	}
 	close(listen_sock);
-
-	if (shutdown(multicast_sock, SHUT_RDWR) != 0)
-	{
-		fprintf(stderr,"shutdow socket error, sock_fd=%d\n", multicast_sock);
-	}
-	close(multicast_sock);
+	close(multicast_sock);	
 }
 
 int Server::acceptConnection(sockaddr_in &remote_sock_addr)
