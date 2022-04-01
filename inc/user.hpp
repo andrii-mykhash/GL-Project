@@ -10,13 +10,13 @@ struct User
     int uid;
     std::string ip;
     Dot coords;
-    std::strong_ordering operator<=> (const User rhs) const
+    std::strong_ordering operator<=> (const User to_compare) const
     {
-        return this->uid <=> rhs.uid;
+        return this->uid <=> to_compare.uid;
     } 
-    bool operator== (const User rhs) const
+    bool operator== (const User to_compare) const
     {
-        return this->uid == rhs.uid;
+        return this->uid == to_compare.uid;
     }  
 };
 

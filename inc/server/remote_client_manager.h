@@ -35,7 +35,6 @@ private:
 	Field* field;
 	int thread_id;
 	int id;
-	
 };
 
 #endif

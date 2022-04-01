@@ -18,9 +18,9 @@ public:
 
     int init(std::string ip);
 
-    bool isMovableChar(char move_offset) const;
+    bool isMovableChar(char move_char) const;
 
-    void sendMoveDirection(char move_offset);
+    void sendMoveDirection(char move_direction);
 
 private:
     void setupMulticast();

@@ -14,7 +14,11 @@ public:
 
     void draw();
 
-    void setMap(std::map<int, User> to_assign);
+    inline void setMap(std::map<int, User> to_assign)
+    {
+        users.clear();
+        users = to_assign;
+    }
 
     ~FieldDrawer();
 

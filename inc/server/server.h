@@ -11,13 +11,11 @@
 class Server
 {
 public:
-	// Server();
-
 	~Server();
 
 	int init(char ttl_number);
 
-	void createTread(int remote_sock, sockaddr_in &remote_sock_addr);
+	void createThread(int remote_sock, sockaddr_in &remote_sock_addr);
 
 	int acceptConnection(sockaddr_in &remote_sock_addr);
 
@@ -40,7 +38,7 @@ private:
 	int listen_sock;
 	std::atomic_bool can_share_map;
 
-	std::thread observer_thread;
+	std::thread notify_thread;
 	std::vector<RemoteClientManager*> clients;
 	int thread_id;
 	Field field;

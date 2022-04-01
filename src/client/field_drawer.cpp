@@ -15,11 +15,11 @@ void FieldDrawer::init(int _id)
     *tty << FieldDrawer::EXPAND_TERMINAL_VALUE;
 }
 
-void FieldDrawer::setMap(std::map<int, User> to_assign)
-{
-    users.clear();
-    users = to_assign;
-}
+// void FieldDrawer::setMap(std::map<int, User> to_assign)
+// {
+//     users.clear();
+//     users = to_assign;
+// }
 
 void FieldDrawer::initTTY()
 {//                        /dev/stdout    /dev/tty

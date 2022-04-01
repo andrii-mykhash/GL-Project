@@ -88,9 +88,9 @@ int Server::initMulticast(char ttl_number)
 Server::~Server()
 {	
 	can_share_map = false;
-	if(observer_thread.joinable())
+	if(notify_thread.joinable())
 	{
-		observer_thread.join();
+		notify_thread.join();
 	}
 
 	if (shutdown(listen_sock, SHUT_RDWR) != 0)
@@ -153,7 +153,7 @@ void Server::sendMap()
 
 void Server::notifyMap()
 {
-	observer_thread = std::thread([&]()
+	notify_thread = std::thread([&]()
 	{
 		while (can_share_map)
 		{	
@@ -163,7 +163,7 @@ void Server::notifyMap()
 	});
 }
 
-void Server::createTread(int remote_sock, sockaddr_in &remote_sock_addr)
+void Server::createThread(int remote_sock, sockaddr_in &remote_sock_addr)
 {
 	clients.push_back(new RemoteClientManager 
 			(remote_sock, &field , thread_id++, remote_sock_addr));

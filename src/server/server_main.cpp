@@ -24,7 +24,7 @@ int main()
     t1.detach();
 
 	Server server;
-    
+
     {
         int ret_code;
         if((ret_code = server.init((char)1)) != 0)
@@ -43,7 +43,7 @@ int main()
         {
             continue;
         }
-        server.createTread(remote_sock, sock_addr);
+        server.createThread(remote_sock, sock_addr);
     }
     return 0;
 }

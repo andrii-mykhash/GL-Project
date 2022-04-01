@@ -7,7 +7,7 @@ struct Dot
 {
     int x;
     int y;
-    std::weak_ordering operator<=>(const Dot &to_verify) const;
+    std::weak_ordering operator<=>(const Dot &to_compare) const;
 };
 
 #endif
