@@ -3,6 +3,14 @@
 #include <unistd.h>
 #include <string.h>
 
+/**
+ * @brief Construct a new Remote Client Manager:: Remote Client Manager object
+ * 
+ * @param remote_sock 
+ * @param field_r 
+ * @param thread_id 
+ * @param addr 
+ */
 RemoteClientManager::RemoteClientManager(int remote_sock,
         Field* field_r, int thread_id, sockaddr_in& addr) 
         : remote_socket(remote_sock), field(field_r), thread_id(thread_id)
@@ -36,16 +44,6 @@ int RemoteClientManager::createUser(sockaddr_in &remote_sock_addr)
     return id;
 }
 
-bool RemoteClientManager::isCorrectChar(char to_verify)
-{
-    return (to_verify == ComandKeys::UP)
-               ? false : (to_verify == ComandKeys::LEFT)
-               ? false : (to_verify == ComandKeys::DOWN)
-               ? false : (to_verify == ComandKeys::RIGHT)
-               ? false : (to_verify == ComandKeys::EXIT)
-               ? false : true;
-}
-
 char RemoteClientManager::recvMoveDirection()
 {
     char command_buffer;
@@ -62,8 +60,8 @@ char RemoteClientManager::recvMoveDirection()
 
     if(check != 0 || ret == -1 || (ret == 0 && command_buffer == '\0'))
     {
-        printf("%c, check=%i\n", ComandKeys::EXIT, check); 
-        return ComandKeys::EXIT;
+        printf("%c, check=%i\n", CommandKeys::EXIT, check); 
+        return CommandKeys::EXIT;
     }
     return command_buffer;
 }
@@ -72,37 +70,36 @@ void RemoteClientManager::move(char move_direction, User &to_move)
 {
     switch (move_direction)
     {
-    case ComandKeys::EXIT:
+    case CommandKeys::EXIT:
         field->remove(to_move);
         return;
 
-    case ComandKeys::DOWN:
+    case CommandKeys::DOWN:
         to_move.coords.y++;
         to_move.coords.y = (to_move.coords.y > (FIELD_HEIGHT-1)) ? 0 
                         : (to_move.coords.y < 0) ? (FIELD_HEIGHT-1)
                         : to_move.coords.y;
         return;
 
-    case ComandKeys::LEFT:
+    case CommandKeys::LEFT:
         to_move.coords.x--;
         to_move.coords.x = (to_move.coords.x > (FIELD_WIDTH-1)) ? 0
                         : (to_move.coords.x < 0) ? (FIELD_WIDTH-1)
                         : to_move.coords.x;
         return;
 
-    case ComandKeys::UP:
+    case CommandKeys::UP:
         to_move.coords.y--;
         to_move.coords.y = (to_move.coords.y > (FIELD_HEIGHT-1)) ? 0 
                         : (to_move.coords.y < 0) ? (FIELD_HEIGHT-1)
                         : to_move.coords.y;
         return;
 
-    case ComandKeys::RIGHT:
+    case CommandKeys::RIGHT:
         to_move.coords.x++;
         to_move.coords.x = (to_move.coords.x > (FIELD_WIDTH-1)) ? 0 
                         : (to_move.coords.x < 0) ? (FIELD_WIDTH-1)
                         : to_move.coords.x;
-
         return;
     }
 }
@@ -133,7 +130,7 @@ void RemoteClientManager::manageConnection()
         command_buffer = recvMoveDirection();
         field->getUser(current_user.uid, current_user);
         move(command_buffer, current_user);
-        if(command_buffer == ComandKeys::EXIT)
+        if(command_buffer == CommandKeys::EXIT)
         {
             break;
         }

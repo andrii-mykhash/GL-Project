@@ -15,7 +15,7 @@ public:
 
 	int init(char ttl_number);
 
-	void createThread(int remote_sock, sockaddr_in &remote_sock_addr);
+	void startUserThread(int remote_sock, sockaddr_in &remote_sock_addr);
 
 	int acceptConnection(sockaddr_in &remote_sock_addr);
 

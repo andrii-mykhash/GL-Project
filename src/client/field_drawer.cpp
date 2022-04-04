@@ -1,35 +1,50 @@
 #include "client/field_drawer.h"
 #include "both_data.h"
 
+/**
+ *  @brief Destroy the FieldDrawer::FieldDrawer object.
+ * 
+ * 
+ *  Destroy object, reset terminal size and set TTY to cooked mode.
+ */
 FieldDrawer::~FieldDrawer()
 {
     *tty << FieldDrawer::RESET_TERMINAL_VALUE;
     system("/bin/stty cooked");
 }
 
+/**
+ * @brief Initialize main components.
+ * 
+ * Open and set tty to raw mode, expand terminal size and set user id.
+ * 
+ * @param[in] _id Current user id
+ */
 void FieldDrawer::init(int _id)
 {
     system("/bin/stty raw");
+    openTTYFile();
     id = _id;
-    initTTY();
     *tty << FieldDrawer::EXPAND_TERMINAL_VALUE;
 }
 
-// void FieldDrawer::setMap(std::map<int, User> to_assign)
-// {
-//     users.clear();
-//     users = to_assign;
-// }
-
-void FieldDrawer::initTTY()
+/**
+ * @brief Initialize TTY i/o.
+ * 
+ * Open \"/dev/tty\" file in input/output mode.
+ */
+void FieldDrawer::openTTYFile()
 {//                        /dev/stdout    /dev/tty
-    tty = std::make_unique<std::fstream>("/dev/stdout", std::ios::binary | std::ios::in | std::ios::out);
+    tty = std::make_unique<std::fstream>("/dev/tty", std::ios::binary | std::ios::in | std::ios::out);
     if (!tty->is_open())
     {
         throw std::runtime_error("tty open error");
     }
 }
 
+/**
+ * @brief Draw UI - users, field and controlls button.
+ */
 void FieldDrawer::draw()
 {
     *tty << FieldDrawer::CLEAR_TERMINAL_VALUE;
@@ -39,6 +54,9 @@ void FieldDrawer::draw()
     tty->flush();
 }
 
+/**
+ * @brief Print info about all users.
+ */
 void FieldDrawer::printAllUsers()
 {
     int i = 1;
@@ -57,11 +75,11 @@ void FieldDrawer::printAllUsers()
     *tty << std::endl;
 }
 
+/**
+ * @brief Draw field grid [FIELD_WIDTH][FIELD_HEIGHT] dimmention.
+ */
 void FieldDrawer::drawField()
 {
-    /*
-        Output field that have got 80x24 dimention and contain all curent users
-    */
     char paint[FIELD_WIDTH][FIELD_HEIGHT] = {'\0'};
     for (auto it = users.cbegin(); it != users.cend(); ++it)
     {

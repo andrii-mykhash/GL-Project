@@ -11,6 +11,7 @@ int main()
     [&]() 
     {	
         std::string s;
+        std::cout << "[Info] To stop server enter \'q\'\n";
         while (std::cin >> s)
         {
             if (s == "exit" || s == "q")
@@ -43,7 +44,7 @@ int main()
         {
             continue;
         }
-        server.createThread(remote_sock, sock_addr);
+        server.startUserThread(remote_sock, sock_addr);
     }
     return 0;
 }

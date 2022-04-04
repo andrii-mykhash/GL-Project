@@ -18,7 +18,7 @@ public:
 
     int init(std::string ip);
 
-    bool isMovableChar(char move_char) const;
+    static bool isMoveCorrectChar(char to_verify);
 
     void sendMoveDirection(char move_direction);
 
@@ -27,7 +27,7 @@ private:
 
     int connectToServer(std::string ip);
 
-    void createRecvMapThread();
+    void grabMapFromMulticastThread();
 
     std::map<int, User> recvMap();
 

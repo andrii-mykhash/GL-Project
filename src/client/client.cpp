@@ -6,30 +6,41 @@
 #include <errno.h>
 #include <map>
 
+/**
+ * @brief Initialize main components.
+ * 
+ * Connect to remote server, setup multicast, init field drawer, 
+ * get id and create map grabber thread. 
+ * 
+ * @param ip remote address of server
+ * @return 0 in success, -n..-1 in error  
+ */
 int Client::init(std::string ip)
 {
     int rec = 0;
     int id = 0;
     if((rec = connectToServer(ip)) < 0)
     {
-        return rec;
+        return -1;
     }
     rec = recv(server_sock, &id, sizeof(id), 0);
     if (rec != sizeof(id))
     {
-        int err = errno;
-        std::string str = "recv: id - ";
-        str.append(std::to_string(rec))
-            .append(" != 4 - sizeof(int)\n strerror= ").append(strerror(err));
-        throw std::runtime_error(str);
+        return -2;
     }
     f_drawer.init(id);
 
     setupMulticast();
-    createRecvMapThread();   
+    grabMapFromMulticastThread();   
     return 0;
 }
 
+/**
+ * @brief Connect to remote server.
+ * 
+ * @param ip remote address
+ * @return 0 in success, -n..-1 in error  
+ */
 int Client::connectToServer(std::string ip)
 {
     sockaddr_in serv_addr;
@@ -52,6 +63,11 @@ int Client::connectToServer(std::string ip)
     return 0;
 }
 
+/**
+ * @brief Destroy the Client::Client object.
+ * 
+ * Join multicast thread, close socket file descriptors. 
+ */
 Client::~Client()
 {
     if(map_tread.joinable())
@@ -67,6 +83,9 @@ Client::~Client()
     close(multicast_sock);
 }
 
+/**
+ * @brief Create UDP multicast socket.
+ */
 void Client::setupMulticast()
 {
     multicast_sock = socket(AF_INET, SOCK_DGRAM,0);
@@ -97,17 +116,19 @@ void Client::setupMulticast()
     ret = setsockopt(multicast_sock, IPPROTO_IP,
         IP_ADD_MEMBERSHIP, &multicast, sizeof(multicast));
     if(ret == -1){ printf("set_mult3: IPPROTO_IP, IP_ADD_MEMBERSHIP");}
-
 }
 
-void Client::createRecvMapThread()
+/**
+ * @brief Create thread to 
+ */
+void Client::grabMapFromMulticastThread()
 {
     map_tread = std::thread([&](){
         while(1)
         {
             usleep(MICROSEC_WAIT);
             f_drawer.setMap(recvMap());
-            if(move_char == ComandKeys::EXIT)
+            if(move_char == CommandKeys::EXIT)
             { 
                 break;
             }
@@ -116,6 +137,11 @@ void Client::createRecvMapThread()
     });
 }
 
+/**
+ * @brief Receive map with users info from remove server. 
+ * 
+ * @return non-empty map in success 
+ */
 std::map<int, User> Client::recvMap()
 {
     size_t buff_size = 0;
@@ -150,18 +176,29 @@ std::map<int, User> Client::recvMap()
     return user;
 }
 
-bool Client::isMovableChar(char move_offset) const
+/**
+ * @brief Check whether char belong to CommandKeys enum.
+ * 
+ * @param to_verify char that need test 
+ * @return true if belong to CommandKeys enum.
+ */
+bool Client::isMoveCorrectChar(char to_verify)
 {
-    return (move_offset == ComandKeys::UP)
-               ? false : (move_offset == ComandKeys::LEFT)
-               ? false : (move_offset == ComandKeys::DOWN)
-               ? false : (move_offset == ComandKeys::RIGHT)
-               ? false : (move_offset == ComandKeys::EXIT)
+    return (to_verify == CommandKeys::UP)
+               ? false : (to_verify == CommandKeys::LEFT)
+               ? false : (to_verify == CommandKeys::DOWN)
+               ? false : (to_verify == CommandKeys::RIGHT)
+               ? false : (to_verify == CommandKeys::EXIT)
                ? false : true;
 }
 
-void Client::sendMoveDirection(char move_offset)
+/**
+ * @brief Send char to remote server 
+ * 
+ * @param move_direction one of CommandKeys enum char
+ */
+void Client::sendMoveDirection(char move_direction)
 {
-    move_char = move_offset;
-    send(server_sock, &move_offset, sizeof(move_offset), 0);
+    move_char = move_direction;
+    send(server_sock, &move_direction, sizeof(move_direction), 0);
 }

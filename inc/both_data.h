@@ -1,7 +1,7 @@
 #ifndef GL_BOTH_DATA_H
 #define GL_BOTH_DATA_H
 
-enum ComandKeys : char
+enum CommandKeys : char
 {
     LEFT = 'a',
     RIGHT = 'd',

@@ -21,8 +21,6 @@ private:
     
 	int createUser(sockaddr_in &remote_sock_addr);
 
-	bool isCorrectChar(char to_verify);
-
 	char recvMoveDirection();
 
 	void move(char move_direction, User &to_move);

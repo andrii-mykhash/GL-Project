@@ -47,9 +47,9 @@ CONTINUE_WORK:
         do
         {
             std::cin >> move_offset;
-        } while (client.isMovableChar(move_offset));
+        } while (Client::isMoveCorrectChar(move_offset));
         client.sendMoveDirection(move_offset);
-        if(move_offset == ComandKeys::EXIT){ break; }
+        if(move_offset == CommandKeys::EXIT){ break; }
         move_offset = '\0';
     }
     std::cout << std::endl;

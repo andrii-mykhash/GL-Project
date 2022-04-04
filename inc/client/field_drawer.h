@@ -23,7 +23,7 @@ public:
     ~FieldDrawer();
 
 private:
-    void initTTY();
+    void openTTYFile();
 
     void drawField();
 

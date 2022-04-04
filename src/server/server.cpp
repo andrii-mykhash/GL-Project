@@ -8,6 +8,12 @@
 #include <algorithm>
 #include <errno.h>
 
+/**
+ * @brief 
+ * 
+ * @param
+ * @return 
+ */
 int Server::init(char ttl_number)
 {
 	can_share_map = true;
@@ -163,7 +169,7 @@ void Server::notifyMap()
 	});
 }
 
-void Server::createThread(int remote_sock, sockaddr_in &remote_sock_addr)
+void Server::startUserThread(int remote_sock, sockaddr_in &remote_sock_addr)
 {
 	clients.push_back(new RemoteClientManager 
 			(remote_sock, &field , thread_id++, remote_sock_addr));
