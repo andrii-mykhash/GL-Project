@@ -4,3 +4,4 @@ log.cpp
 tty_main*
 tmp.cpp
 tmp
+doc/doxygen

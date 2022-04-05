@@ -8,11 +8,14 @@
 #include <vector> 
 #include <iostream>
 
+/**
+ * @brief Used by library 'json.hpp' as Serializer.
+ * 
+ * @param j nlohmann::json object
+ * @param u User struct
+ */
 void to_json(nlohmann::json &j, const User &u)
 {
-    /*
-        Used by json.hpp as serializer
-    */
     j = nlohmann::json{
         {"uid", u.uid},
         {"ip", u.ip},
@@ -21,23 +24,29 @@ void to_json(nlohmann::json &j, const User &u)
           {"y", u.coords.y}}}};
 }
 
+/**
+ * @brief Used by library 'json.hpp' as Deserializer.
+ * 
+ * @param j nlohmann::json object
+ * @param u User struct
+ */
 void from_json(const nlohmann::json &j, User &u)
 {
-    /*
-        Used by json.hpp as DEserializer
-    */
     j.at("uid").get_to(u.uid);
     j.at("ip").get_to(u.ip);
     j.at("/coords/x"_json_pointer).get_to(u.coords.x);
     j.at("/coords/y"_json_pointer).get_to(u.coords.y);
 }
 
-
+/**
+ * @brief Convert map<int,User> to json.
+ * 
+ * std::map<int,User> transforms to std::vector<uint8_t> that has got compressed binary json (CBOR).
+ * @param users map to convert
+ * @return char vector with compressed binary json data
+ */
 std::vector<std::uint8_t> map_to_json(std::map<int,User> users)
 {
-    /*
-        Convert from map<int id, User> to binary array
-    */
     std::map<std::string, User> temp;
 
     for (auto const & pair : users) {
@@ -47,11 +56,13 @@ std::vector<std::uint8_t> map_to_json(std::map<int,User> users)
     return  nlohmann::json::to_cbor(serialize);
 }
 
+/**
+ * @brief Convert json in vector<uint8_t> to map<int,User>.
+ * 
+ * @param bin_json vector with compressed json data 
+ */
 std::map<int,User> json_to_map(std::vector<std::uint8_t> bin_json)
 {
-    /*
-        Convert from binary array to map<int id, User>
-    */
     nlohmann::json deserialize;
     try{
         deserialize = nlohmann::json::from_cbor(bin_json.begin(),bin_json.end(),false,true);

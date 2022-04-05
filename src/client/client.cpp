@@ -1,3 +1,13 @@
+/**
+ * @file client.cpp
+ * @author Andrii (you@domain.com)
+ * @brief 
+ * @version 0.1
+ * @date 2022-04-04
+ * 
+ * @copyright Copyright MIT (c) 2022
+ * 
+ */
 #include "client/client.h"
 #include "json_wrapper.hpp"
 
@@ -28,7 +38,7 @@ int Client::init(std::string ip)
     {
         return -2;
     }
-    f_drawer.init(id);
+    field_drawer.init(id);
 
     setupMulticast();
     grabMapFromMulticastThread();   
@@ -64,15 +74,15 @@ int Client::connectToServer(std::string ip)
 }
 
 /**
- * @brief Destroy the Client::Client object.
+ * @brief Destroy the Client object.
  * 
  * Join multicast thread, close socket file descriptors. 
  */
 Client::~Client()
 {
-    if(map_tread.joinable())
+    if(map_receiver_tread.joinable())
     {
-        map_tread.join();
+        map_receiver_tread.join();
     }
     if (shutdown(server_sock, SHUT_RDWR) != 0)
     {
@@ -119,20 +129,20 @@ void Client::setupMulticast()
 }
 
 /**
- * @brief Create thread to 
+ * @brief Create thread that receives std::map<int,User> from multicast
  */
 void Client::grabMapFromMulticastThread()
 {
-    map_tread = std::thread([&](){
+    map_receiver_tread = std::thread([&](){
         while(1)
         {
             usleep(MICROSEC_WAIT);
-            f_drawer.setMap(recvMap());
+            field_drawer.setMap(recvMap());
             if(move_char == CommandKeys::EXIT)
             { 
                 break;
             }
-            f_drawer.draw();
+            field_drawer.draw();
         }
     });
 }
@@ -147,7 +157,7 @@ std::map<int, User> Client::recvMap()
     size_t buff_size = 0;
     int rec = 0;
     socklen_t sock_len = sizeof(multicast_addr);
-    cbor_data.clear();
+    cbor_json.clear();
     std::map<int, User> user;
     rec = recvfrom(multicast_sock, &buff_size, sizeof(buff_size), 0,
                 (sockaddr *)&multicast_addr, &sock_len);
@@ -155,9 +165,9 @@ std::map<int, User> Client::recvMap()
 		int err = errno;
 		fprintf(stderr, "recvMap1. Error: errno=%i, str: %s\n", err, strerror(err));
 	}
-    cbor_data.resize(buff_size);
+    cbor_json.resize(buff_size);
 
-    rec = recvfrom(multicast_sock, cbor_data.data(), buff_size, 0,
+    rec = recvfrom(multicast_sock, cbor_json.data(), buff_size, 0,
                 (sockaddr *)&multicast_addr, &sock_len);
     if (rec == -1){
 		int err = errno;
@@ -168,7 +178,7 @@ std::map<int, User> Client::recvMap()
         fprintf(stderr,"recvMap3. rec != buff_size: %i != %lu\n", rec, buff_size);
     }
     try{
-        user = json_to_map(cbor_data);
+        user = json_to_map(cbor_json);
     }catch(...)
     {
         user.clear();
@@ -177,13 +187,15 @@ std::map<int, User> Client::recvMap()
 }
 
 /**
- * @brief Check whether char belong to CommandKeys enum.
+ * @brief Check if char belong to CommandKeys enum.
  * 
+ * Converting a single char to lowercase and comparing.
  * @param to_verify char that need test 
  * @return true if belong to CommandKeys enum.
  */
 bool Client::isMoveCorrectChar(char to_verify)
 {
+    to_verify = std::tolower(to_verify);
     return (to_verify == CommandKeys::UP)
                ? false : (to_verify == CommandKeys::LEFT)
                ? false : (to_verify == CommandKeys::DOWN)

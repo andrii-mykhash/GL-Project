@@ -19,7 +19,7 @@ public:
 private:
     void closeConnection(int sock);
     
-	int createUser(sockaddr_in &remote_sock_addr);
+	int addNewUserToField(sockaddr_in &remote_sock_addr);
 
 	char recvMoveDirection();
 
@@ -29,7 +29,7 @@ private:
 
 private:
 	int remote_socket;
-    std::thread t_mc;
+    std::thread manage_connection_thread;
 	Field* field;
 	int thread_id;
 	int id;

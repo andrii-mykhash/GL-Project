@@ -1,9 +1,18 @@
+/**
+ * @file field_drawer.cpp
+ * @author Andrii (you@domain.com)
+ * @brief 
+ * @version 0.1
+ * @date 2022-04-04
+ * 
+ * @copyright Copyright MIT (c) 2022
+ * 
+ */
 #include "client/field_drawer.h"
 #include "both_data.h"
 
 /**
- *  @brief Destroy the FieldDrawer::FieldDrawer object.
- * 
+ *  @brief Destroy the FieldDrawer object.
  * 
  *  Destroy object, reset terminal size and set TTY to cooked mode.
  */
@@ -18,7 +27,7 @@ FieldDrawer::~FieldDrawer()
  * 
  * Open and set tty to raw mode, expand terminal size and set user id.
  * 
- * @param[in] _id Current user id
+ * @param[in] id Current user id
  */
 void FieldDrawer::init(int _id)
 {
@@ -60,7 +69,7 @@ void FieldDrawer::draw()
 void FieldDrawer::printAllUsers()
 {
     int i = 1;
-    for (auto it = users.cbegin(); it != users.cend(); ++it)
+    for (auto it = users_info.cbegin(); it != users_info.cend(); ++it)
     {
         if (it->first == id)
         {
@@ -81,7 +90,7 @@ void FieldDrawer::printAllUsers()
 void FieldDrawer::drawField()
 {
     char paint[FIELD_WIDTH][FIELD_HEIGHT] = {'\0'};
-    for (auto it = users.cbegin(); it != users.cend(); ++it)
+    for (auto it = users_info.cbegin(); it != users_info.cend(); ++it)
     {
         if (it->first == id)
         {

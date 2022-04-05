@@ -1,23 +1,38 @@
+/**
+ * @file remote_client_manager.cpp
+ * @author Andrii (you@domain.com)
+ * @brief 
+ * @version 0.1
+ * @date 2022-04-04
+ * 
+ * @copyright Copyright MIT (c) 2022
+ * 
+ */
 #include "server/remote_client_manager.h"
 
 #include <unistd.h>
 #include <string.h>
 
 /**
- * @brief Construct a new Remote Client Manager:: Remote Client Manager object
+ * @brief Construct a new RemoteClientManager object that responce for an user connection.
  * 
- * @param remote_sock 
- * @param field_r 
- * @param thread_id 
- * @param addr 
+ * @param remote_sock file descriptor
+ * @param field_r reference to Field object 
+ * @param thread_id this object id
+ * @param addr struct with IP:PORT
  */
 RemoteClientManager::RemoteClientManager(int remote_sock,
         Field* field_r, int thread_id, sockaddr_in& addr) 
         : remote_socket(remote_sock), field(field_r), thread_id(thread_id)
 {
-    id = createUser(addr);
+    id = addNewUserToField(addr);
 }
 
+/**
+ * @brief Close TCP socket
+ * 
+ * @param sock file descriptor
+ */
 void RemoteClientManager::closeConnection(int sock)
 {
     if (shutdown(sock, SHUT_RDWR) != 0)
@@ -30,7 +45,13 @@ void RemoteClientManager::closeConnection(int sock)
     printf("closed connection: sock_fd=%d \n", sock);
 }
 
-int RemoteClientManager::createUser(sockaddr_in &remote_sock_addr)
+/**
+ * @brief Add new user to global Field
+ * 
+ * @param remote_sock_addr struct with IP:PORT
+ * @return id number
+ */
+int RemoteClientManager::addNewUserToField(sockaddr_in &remote_sock_addr)
 {
     char str[INET_ADDRSTRLEN] = {0};
     inet_ntop(AF_INET, &(remote_sock_addr.sin_addr), str, INET_ADDRSTRLEN);
@@ -44,6 +65,11 @@ int RemoteClientManager::createUser(sockaddr_in &remote_sock_addr)
     return id;
 }
 
+/**
+ * @brief Receive char from client
+ * 
+ * @return char that belong to CommandKeys enum.
+ */
 char RemoteClientManager::recvMoveDirection()
 {
     char command_buffer;
@@ -63,17 +89,20 @@ char RemoteClientManager::recvMoveDirection()
         printf("%c, check=%i\n", CommandKeys::EXIT, check); 
         return CommandKeys::EXIT;
     }
+    command_buffer = std::tolower(command_buffer);
     return command_buffer;
 }
 
+/**
+ * @brief Move user at one position: left, right, up or down.
+ * 
+ * @param move_direction char with move direction that belong to CommandKeys enum
+ * @param to_move reference to User struct
+ */
 void RemoteClientManager::move(char move_direction, User &to_move)
 {
     switch (move_direction)
     {
-    case CommandKeys::EXIT:
-        field->remove(to_move);
-        return;
-
     case CommandKeys::DOWN:
         to_move.coords.y++;
         to_move.coords.y = (to_move.coords.y > (FIELD_HEIGHT-1)) ? 0 
@@ -104,22 +133,34 @@ void RemoteClientManager::move(char move_direction, User &to_move)
     }
 }
 
+/**
+ * @brief Start thread worker
+ * 
+ */
 void RemoteClientManager::run()
 {
-    t_mc = std::thread([&]()
+    manage_connection_thread = std::thread([&]()
     {
         this->manageConnection();
     });
 }
 
+/**
+ * @brief Stop thread worker
+ * 
+ */
 void RemoteClientManager::stop()
 {
-    if(t_mc.joinable())
+    if(manage_connection_thread.joinable())
     {
-        t_mc.join();
+        manage_connection_thread.join();
     }
 }
 
+/**
+ * @brief Manage client connection 
+ * 
+ */
 void RemoteClientManager::manageConnection()
 {
     User current_user;
@@ -132,6 +173,7 @@ void RemoteClientManager::manageConnection()
         move(command_buffer, current_user);
         if(command_buffer == CommandKeys::EXIT)
         {
+            field->remove(current_user);
             break;
         }
         field->move(current_user);

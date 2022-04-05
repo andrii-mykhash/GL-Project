@@ -32,15 +32,15 @@ private:
     std::map<int, User> recvMap();
 
 private:
-    FieldDrawer f_drawer;
+    FieldDrawer field_drawer;
     int server_sock;
     int multicast_sock;
     sockaddr_in multicast_addr;
 
     std::atomic<char> move_char;
-    std::thread map_tread;
+    std::thread map_receiver_tread;
     
-    std::vector<std::uint8_t> cbor_data;
+    std::vector<std::uint8_t> cbor_json;
     
 	inline static const char *MULTICAST_IP = "229.0.0.80";
     static constexpr int TCP_PORT = 8088;

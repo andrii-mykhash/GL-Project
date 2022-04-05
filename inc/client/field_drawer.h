@@ -16,8 +16,7 @@ public:
 
     inline void setMap(std::map<int, User> to_assign)
     {
-        users.clear();
-        users = to_assign;
+        users_info = to_assign;
     }
 
     ~FieldDrawer();
@@ -31,7 +30,7 @@ private:
 
 private:
     User currend_user;
-    std::map<int, User> users;
+    std::map<int, User> users_info;
     std::unique_ptr<std::fstream> tty;
     int id; 
 

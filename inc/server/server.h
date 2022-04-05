@@ -36,9 +36,9 @@ private:
 	int multicast_sock;
 	sockaddr_in multicast_addr;
 	int listen_sock;
-	std::atomic_bool can_share_map;
+	std::atomic_bool can_notify_map;
 
-	std::thread notify_thread;
+	std::thread notify_map_thread;
 	std::vector<RemoteClientManager*> clients;
 	int thread_id;
 	Field field;

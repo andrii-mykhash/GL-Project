@@ -8,7 +8,7 @@ CC = g++-10
 
 .Phony: all clear test sc
 
-all: test sc
+all: test sc docs
 
 #------------ Build  -----------
 
@@ -84,3 +84,8 @@ json_wrapper_test.o: dot.o $(TEST)/json_wrapper_test.cpp
 
 clear: 
 	rm -rf ./$(BUILD)
+
+#------------ Docs ------------
+
+docs: 
+	doxygen doxygen.conf 

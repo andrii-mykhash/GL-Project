@@ -27,9 +27,9 @@ public:
     std::map<int, User> getMap();
 
 private:
-    static int id_count;
+    static int id_counter;
     std::random_device rand_device;
-    std::map<int, User> users;
+    std::map<int, User> users_info;
     std::mutex map_mutex;
     mutable std::mutex collision_mutex;
 };

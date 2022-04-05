@@ -1,3 +1,14 @@
+/**
+ * @file server.cpp
+ * @author Andrii (you@domain.com)
+ * @brief 
+ * @version 0.1
+ * @date 2022-04-04
+ * 
+ * @copyright Copyright MIT (c) 2022
+ * 
+ */
+
 #include "server/server.h"
 #include "json_wrapper.hpp"
 
@@ -9,14 +20,14 @@
 #include <errno.h>
 
 /**
- * @brief 
+ * @brief Initialize servet TCP and UDP sockets, start multicasting map data.
  * 
- * @param
- * @return 
+ * @param ttl_number
+ * @return 0 in success
  */
 int Server::init(char ttl_number)
 {
-	can_share_map = true;
+	can_notify_map = true;
 	thread_id = 0;
 	int ret = 0;
 	if((ret = initServer()) < 0){
@@ -28,6 +39,11 @@ int Server::init(char ttl_number)
 	return 0;
 }
 
+/**
+ * @brief Create TCP listen socket.
+ * 
+ * @return 0 in success, -n..-1 in error
+ */
 int Server::initServer()
 {
 	listen_sock = socket(AF_INET, SOCK_STREAM, 0); 
@@ -55,7 +71,12 @@ int Server::initServer()
 	return 0;
 }
 
-
+/**
+ * @brief Create UDP multicast socket. 
+ * 
+ * @param ttl_number
+ * @return 0 in success
+ */
 int Server::initMulticast(char ttl_number)
 {
 	multicast_sock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -91,12 +112,17 @@ int Server::initMulticast(char ttl_number)
 	return 0;
 }
 
+/**
+ * @brief Destroy the Server object.
+ * 
+ * Stop multicasting map data, close TCP and UDP sockets.
+ */
 Server::~Server()
 {	
-	can_share_map = false;
-	if(notify_thread.joinable())
+	can_notify_map = false;
+	if(notify_map_thread.joinable())
 	{
-		notify_thread.join();
+		notify_map_thread.join();
 	}
 
 	if (shutdown(listen_sock, SHUT_RDWR) != 0)
@@ -107,6 +133,13 @@ Server::~Server()
 	close(multicast_sock);	
 }
 
+/**
+ * @brief Accept new connection.
+ * 
+ * Try to accept new user during 5 seconds.
+ * @param remote_sock_addr struct to store IP:PORT 
+ * @return file descriptor in success, -1 if time out, -errno if accept error
+ */
 int Server::acceptConnection(sockaddr_in &remote_sock_addr)
 {
     fd_set readfds;
@@ -124,7 +157,8 @@ int Server::acceptConnection(sockaddr_in &remote_sock_addr)
 		if ((remote_sock = accept(listen_sock, 
 				(sockaddr *)&remote_sock_addr, &length)) < 0)
 		{ 
-			return -2; 
+			int err = errno;
+			return -err; 
 		}
 		printf("new connection: fd=%d\n", remote_sock);
 		return remote_sock;
@@ -132,6 +166,10 @@ int Server::acceptConnection(sockaddr_in &remote_sock_addr)
 	return -1;
 }
 
+/**
+ * @brief Send json with map data.
+ * 
+ */
 void Server::sendMap()
 {
 	int ret = 0;
@@ -157,11 +195,15 @@ void Server::sendMap()
 	}
 }
 
+/**
+ * @brief Create thread to multicast data.
+ * 
+ */
 void Server::notifyMap()
 {
-	notify_thread = std::thread([&]()
+	notify_map_thread = std::thread([&]()
 	{
-		while (can_share_map)
+		while (can_notify_map)
 		{	
             usleep(MICROSEC_WAIT);
 			sendMap();
@@ -169,6 +211,12 @@ void Server::notifyMap()
 	});
 }
 
+/**
+ * @brief Append new connection to vector and start job.
+ * 
+ * @param remote_sock socket file descriptor
+ * @param remote_sock_addr struct with IP:PORT
+ */
 void Server::startUserThread(int remote_sock, sockaddr_in &remote_sock_addr)
 {
 	clients.push_back(new RemoteClientManager 
