@@ -14,6 +14,11 @@ public:
 
     void draw();
 
+    /**
+     * @brief Set the Map object
+     * 
+     * @param[in] to_assign 
+     */
     inline void setMap(std::map<int, User> to_assign)
     {
         users_info = to_assign;

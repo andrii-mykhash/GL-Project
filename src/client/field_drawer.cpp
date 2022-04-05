@@ -27,7 +27,7 @@ FieldDrawer::~FieldDrawer()
  * 
  * Open and set tty to raw mode, expand terminal size and set user id.
  * 
- * @param[in] id Current user id
+ * @param[in] _id Current user id
  */
 void FieldDrawer::init(int _id)
 {

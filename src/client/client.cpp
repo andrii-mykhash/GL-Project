@@ -22,7 +22,7 @@
  * Connect to remote server, setup multicast, init field drawer, 
  * get id and create map grabber thread. 
  * 
- * @param ip remote address of server
+ * @param[in] ip remote address of server
  * @return 0 in success, -n..-1 in error  
  */
 int Client::init(std::string ip)
@@ -48,7 +48,7 @@ int Client::init(std::string ip)
 /**
  * @brief Connect to remote server.
  * 
- * @param ip remote address
+ * @param[in] ip remote address
  * @return 0 in success, -n..-1 in error  
  */
 int Client::connectToServer(std::string ip)
@@ -190,7 +190,7 @@ std::map<int, User> Client::recvMap()
  * @brief Check if char belong to CommandKeys enum.
  * 
  * Converting a single char to lowercase and comparing.
- * @param to_verify char that need test 
+ * @param[in] to_verify char that need test 
  * @return true if belong to CommandKeys enum.
  */
 bool Client::isMoveCorrectChar(char to_verify)
@@ -207,7 +207,7 @@ bool Client::isMoveCorrectChar(char to_verify)
 /**
  * @brief Send char to remote server 
  * 
- * @param move_direction one of CommandKeys enum char
+ * @param[in] move_direction one of CommandKeys enum char
  */
 void Client::sendMoveDirection(char move_direction)
 {

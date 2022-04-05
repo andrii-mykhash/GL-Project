@@ -16,10 +16,10 @@
 /**
  * @brief Construct a new RemoteClientManager object that responce for an user connection.
  * 
- * @param remote_sock file descriptor
- * @param field_r reference to Field object 
- * @param thread_id this object id
- * @param addr struct with IP:PORT
+ * @param[in] remote_sock file descriptor
+ * @param[in] field_r reference to Field object 
+ * @param[in] thread_id this object id
+ * @param[in] addr struct with IP:PORT
  */
 RemoteClientManager::RemoteClientManager(int remote_sock,
         Field* field_r, int thread_id, sockaddr_in& addr) 
@@ -31,7 +31,7 @@ RemoteClientManager::RemoteClientManager(int remote_sock,
 /**
  * @brief Close TCP socket
  * 
- * @param sock file descriptor
+ * @param[in] sock file descriptor
  */
 void RemoteClientManager::closeConnection(int sock)
 {
@@ -48,7 +48,7 @@ void RemoteClientManager::closeConnection(int sock)
 /**
  * @brief Add new user to global Field
  * 
- * @param remote_sock_addr struct with IP:PORT
+ * @param[in] remote_sock_addr struct with IP:PORT
  * @return id number
  */
 int RemoteClientManager::addNewUserToField(sockaddr_in &remote_sock_addr)
@@ -96,8 +96,8 @@ char RemoteClientManager::recvMoveDirection()
 /**
  * @brief Move user at one position: left, right, up or down.
  * 
- * @param move_direction char with move direction that belong to CommandKeys enum
- * @param to_move reference to User struct
+ * @param[in] move_direction char with move direction that belong to CommandKeys enum
+ * @param[in out] to_move reference to User struct
  */
 void RemoteClientManager::move(char move_direction, User &to_move)
 {

@@ -22,7 +22,7 @@
 /**
  * @brief Initialize servet TCP and UDP sockets, start multicasting map data.
  * 
- * @param ttl_number
+ * @param[in] ttl_number
  * @return 0 in success
  */
 int Server::init(char ttl_number)
@@ -74,7 +74,7 @@ int Server::initServer()
 /**
  * @brief Create UDP multicast socket. 
  * 
- * @param ttl_number
+ * @param[in] ttl_number
  * @return 0 in success
  */
 int Server::initMulticast(char ttl_number)
@@ -137,7 +137,7 @@ Server::~Server()
  * @brief Accept new connection.
  * 
  * Try to accept new user during 5 seconds.
- * @param remote_sock_addr struct to store IP:PORT 
+ * @param[in out] remote_sock_addr struct to store IP:PORT 
  * @return file descriptor in success, -1 if time out, -errno if accept error
  */
 int Server::acceptConnection(sockaddr_in &remote_sock_addr)
@@ -214,8 +214,8 @@ void Server::notifyMap()
 /**
  * @brief Append new connection to vector and start job.
  * 
- * @param remote_sock socket file descriptor
- * @param remote_sock_addr struct with IP:PORT
+ * @param[in] remote_sock socket file descriptor
+ * @param[in] remote_sock_addr struct with IP:PORT
  */
 void Server::startUserThread(int remote_sock, sockaddr_in &remote_sock_addr)
 {
