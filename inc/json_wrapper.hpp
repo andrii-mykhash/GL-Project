@@ -14,7 +14,7 @@
  * @param j nlohmann::json object
  * @param u User struct
  */
-void to_json(nlohmann::json &j, const User &u)
+static inline void to_json(nlohmann::json &j, const User &u)
 {
     j = nlohmann::json{
         {"uid", u.uid},
@@ -30,7 +30,7 @@ void to_json(nlohmann::json &j, const User &u)
  * @param j nlohmann::json object
  * @param u User struct
  */
-void from_json(const nlohmann::json &j, User &u)
+static inline void from_json(const nlohmann::json &j, User &u)
 {
     j.at("uid").get_to(u.uid);
     j.at("ip").get_to(u.ip);
@@ -45,7 +45,7 @@ void from_json(const nlohmann::json &j, User &u)
  * @param users map to convert
  * @return char vector with compressed binary json data
  */
-std::vector<std::uint8_t> map_to_json(std::map<int,User> users)
+static inline std::vector<std::uint8_t> map_to_json(std::map<int,User> users)
 {
     std::map<std::string, User> temp;
 
@@ -61,7 +61,7 @@ std::vector<std::uint8_t> map_to_json(std::map<int,User> users)
  * 
  * @param bin_json vector with compressed json data 
  */
-std::map<int,User> json_to_map(std::vector<std::uint8_t> bin_json)
+static inline std::map<int,User> json_to_map(std::vector<std::uint8_t> bin_json)
 {
     nlohmann::json deserialize;
     try{
