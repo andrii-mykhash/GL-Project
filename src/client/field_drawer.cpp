@@ -18,8 +18,11 @@
  */
 FieldDrawer::~FieldDrawer()
 {
-    *tty << FieldDrawer::RESET_TERMINAL_VALUE;
-    system("/bin/stty cooked");
+    if(tty)
+    {
+        *tty << FieldDrawer::RESET_TERMINAL_VALUE;
+        system("/bin/stty cooked");
+    }
 }
 
 /**

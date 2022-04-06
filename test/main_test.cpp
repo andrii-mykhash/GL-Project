@@ -1,6 +1,7 @@
 #include "inc/dot_test.h"
 #include "inc/field_test.h"
 #include "inc/json_wrapper_test.h"
+#include "inc/client_test.h"
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/TestResult.h>
@@ -14,6 +15,7 @@
 CPPUNIT_TEST_SUITE_REGISTRATION( DotTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( FieldTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( JsonWrapperTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( ClientTest );
 
 int main()
 {

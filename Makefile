@@ -57,10 +57,10 @@ sc: client_main server_main
 
 #------------ Test -----------
  
-test: mkdir_test dot_test.o field_test.o json_wrapper_test.o
-	$(CC) $(CXX_FLAGS) $(BUILD)/dot.o $(BUILD)/field.o \
-	$(BUILD)/$(TEST)/dot_test.o $(BUILD)/$(TEST)/field_test.o \
-	$(BUILD)/$(TEST)/json_wrapper_test.o $(TEST)/main_test.cpp \
+test: mkdir_test dot_test.o field_test.o json_wrapper_test.o client_test.o
+	$(CC) $(CXX_FLAGS) $(BUILD)/dot.o $(BUILD)/field.o $(BUILD)/field_drawer.o $(BUILD)/client.o \
+	$(BUILD)/$(TEST)/dot_test.o $(BUILD)/$(TEST)/field_test.o $(BUILD)/$(TEST)/json_wrapper_test.o  \
+	$(BUILD)/$(TEST)/client_test.o $(TEST)/main_test.cpp \
 	-lcppunit -o main_test 
 	mv main_test $(BUILD)/$(TEST)/
 
@@ -75,6 +75,9 @@ field_test.o: field.o  $(TEST)/field_test.cpp
 	$(CC) $(CXX_FLAGS) -c $(TEST)/field_test.cpp -lcppunit
 	mv field_test.o $(BUILD)/$(TEST)/
 
+client_test.o: field_drawer.o client.o $(TEST)/client_test.cpp
+	$(CC) $(CXX_FLAGS) -c $(TEST)/client_test.cpp -lcppunit
+	mv client_test.o $(BUILD)/$(TEST)/
 
 json_wrapper_test.o: dot.o $(TEST)/json_wrapper_test.cpp
 	$(CC) $(CXX_FLAGS) -c $(TEST)/json_wrapper_test.cpp -lcppunit

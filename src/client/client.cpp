@@ -25,13 +25,17 @@
  * @param[in] ip remote address of server
  * @return 0 in success, -n..-1 in error  
  */
-int Client::init(std::string ip)
+int Client::init(std::string ip, bool test_flag)
 {
     int rec = 0;
     int id = 0;
     if((rec = connectToServer(ip)) < 0)
     {
         return -1;
+    }
+    if(test_flag)
+    {
+        return 0;
     }
     rec = recv(server_sock, &id, sizeof(id), 0);
     if (rec != sizeof(id))
@@ -80,17 +84,23 @@ int Client::connectToServer(std::string ip)
  */
 Client::~Client()
 {
+    const int NON_SOCK_OPERATION = 88;
+    int err;
     if(map_receiver_tread.joinable())
     {
         map_receiver_tread.join();
+        close(multicast_sock);
     }
     if (shutdown(server_sock, SHUT_RDWR) != 0)
     {
-        int err = errno;
-        fprintf(stderr,"server_sock socket shutdown failed: errno=%i, str=\'%s\'\n",err, strerror(err));
+        err = errno;
+        if(err != NON_SOCK_OPERATION)
+        fprintf(stderr,"\nserver_sock: socket shutdown failed: errno=%i, str=\'%s\'\n",err, strerror(err));
     }
-    close(server_sock);
-    close(multicast_sock);
+    if(err != NON_SOCK_OPERATION)
+    {
+        close(server_sock);
+    }
 }
 
 /**
@@ -197,11 +207,11 @@ bool Client::isMoveCorrectChar(char to_verify)
 {
     to_verify = std::tolower(to_verify);
     return (to_verify == CommandKeys::UP)
-               ? false : (to_verify == CommandKeys::LEFT)
-               ? false : (to_verify == CommandKeys::DOWN)
-               ? false : (to_verify == CommandKeys::RIGHT)
-               ? false : (to_verify == CommandKeys::EXIT)
-               ? false : true;
+               ? true : (to_verify == CommandKeys::LEFT)
+               ? true : (to_verify == CommandKeys::DOWN)
+               ? true : (to_verify == CommandKeys::RIGHT)
+               ? true : (to_verify == CommandKeys::EXIT)
+               ? true : false;
 }
 
 /**

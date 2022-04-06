@@ -16,7 +16,7 @@ class Client
 public:    
     ~Client();
 
-    int init(std::string ip);
+    int init(std::string ip, bool test_flag = false);
 
     static bool isMoveCorrectChar(char to_verify);
 
