@@ -22,7 +22,7 @@ void FieldTest::testMove()
     test_field->getUser(user_id_3,user3);
     temp.coords = user2.coords;
     temp.uid = user3.uid;
-    CPPUNIT_ASSERT(test_field->move(temp) == 1);
+    CPPUNIT_ASSERT(test_field->move(temp) == -1);
 
     // temp.coords.x++;
     // CPPUNIT_ASSERT(test_field->move(temp) == 0);
