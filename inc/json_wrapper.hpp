@@ -1,3 +1,4 @@
+/// @file json_wrapper.hpp
 #ifndef GL_JSON_PARSER_HPP
 #define GL_JSON_PARSER_HPP
 
@@ -39,9 +40,9 @@ static inline void from_json(const nlohmann::json &j, User &u)
 }
 
 /**
- * @brief Convert map<int,User> to json.
+ * @brief Convert std::map<int, User> to json.
  * 
- * std::map<int,User> transforms to std::vector<uint8_t> that has got compressed binary json (CBOR).
+ * std::map<int, User> transforms to std::vector<uint8_t> that has got compressed binary json (CBOR).
  * @param users map to convert
  * @return char vector with compressed binary json data
  */
@@ -57,9 +58,9 @@ static inline std::vector<std::uint8_t> map_to_json(std::map<int,User> users)
 }
 
 /**
- * @brief Convert json in vector<uint8_t> to map<int,User>.
+ * @brief Convert json in std::vector<uint8_t> to std::map<int, User>.
  * 
- * @param bin_json vector with compressed json data 
+ * @param bin_json std::vector with compressed json data 
  */
 static inline std::map<int,User> json_to_map(std::vector<std::uint8_t> bin_json)
 {

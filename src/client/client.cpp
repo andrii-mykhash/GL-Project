@@ -1,13 +1,4 @@
-/**
- * @file client.cpp
- * @author Andrii (you@domain.com)
- * @brief 
- * @version 0.1
- * @date 2022-04-04
- * 
- * @copyright Copyright Andrii (c) 2022
- * 
- */
+/// @file client.cpp
 #include "client/client.h"
 #include "json_wrapper.hpp"
 
@@ -23,7 +14,7 @@
  * get id and create map grabber thread. 
  * 
  * @param[in] ip remote address of server
- * @return 0 in success, -n..-1 in error  
+ * @return 0 in success, one of ::NetworkCode or ::MulticastCode enum code in error
  */
 int Client::init(std::string ip, bool test_flag)
 {
@@ -53,28 +44,28 @@ int Client::init(std::string ip, bool test_flag)
  * @brief Connect to remote server.
  * 
  * @param[in] ip remote address
- * @return 0 in success, -n..-1 in error  
+ * @return 0 in success, one of ::NetworkCode or ::MulticastCode enum code in error
  */
 int Client::connectToServer(std::string ip)
 {
     sockaddr_in serv_addr;
     if ((server_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-        return NetworkError::SOCKET_NOT_CREATED;
+        return NetworkCode::SOCKET_NOT_CREATED;
     }
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(TCP_PORT);
 
     if (inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr) <= 0)
     {
-        return NetworkError::INVALID_ADDRESS;
+        return NetworkCode::INVALID_ADDRESS;
     }
 
     if (connect(server_sock, (sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     {
-        return NetworkError::CANNOT_CONNECT;
+        return NetworkCode::CANNOT_CONNECT;
     }
-    return 0;
+    return NetworkCode::SUCCESS;
 }
 
 /**
@@ -107,8 +98,9 @@ Client::~Client()
 
 /**
  * @brief Create UDP multicast socket.
+ * @return 0 in success, ::NetworkCode::BIND_ERROR or one of ::MulticastCode enum code in error
  */
-void Client::setupMulticast()
+int Client::setupMulticast()
 {
     multicast_sock = socket(AF_INET, SOCK_DGRAM,0);
     int one = 1, ret = 0;
@@ -118,7 +110,12 @@ void Client::setupMulticast()
 
     ret = setsockopt(multicast_sock, SOL_SOCKET, SO_REUSEADDR,
 		    (const void *)(&one), sizeof(one));
-    if(ret == -1){ printf("error: SOL_SOCKET, SO_REUSEADDR");}
+    if(ret == -1)
+    { 
+        int err = errno;
+		fprintf(stderr,"[CLIENT] set_mult: SOL_SOCKET, SO_REUSEADDR, errno=%i, str - %s\n", err, strerror(err));
+		return MulticastCode::REUSE_ADDR_ERROR;
+    }
 
     memset(&multicast_addr, 0, sizeof(multicast_addr));
     multicast_addr.sin_family = AF_INET;
@@ -128,27 +125,42 @@ void Client::setupMulticast()
     sock_len = sizeof(multicast_addr);
     
     ret = bind(multicast_sock, (sockaddr*)&multicast_addr, sock_len);
-    if(ret == -1){ printf("set_mult1:  bind(multicast_sock)");}
+    if(ret == -1)
+    { 
+        int err = errno;
+		fprintf(stderr,"[CLIENT] set_mult:  bind(multicast_sock), errno=%i, str - %s\n", err, strerror(err));
+		return NetworkCode::BIND_ERROR;
+    }
 
     multicast.imr_interface.s_addr = inet_addr("0.0.0.0");
     multicast.imr_multiaddr.s_addr = inet_addr(MULTICAST_IP);
 
     ret = setsockopt(multicast_sock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl));
-    if(ret == -1){ printf("set_mult2:  IPPROTO_IP, IP_MULTICAST_TTL");}
+    if(ret == -1)
+    { 
+        int err = errno;
+		fprintf(stderr,"[CLIENT] set_mult:  IPPROTO_IP, IP_MULTICAST_TTL, errno=%i, str - %s\n", err, strerror(err));
+		return MulticastCode::TTL_SETUP_ERROR;
+    }
+
     ret = setsockopt(multicast_sock, IPPROTO_IP,
         IP_ADD_MEMBERSHIP, &multicast, sizeof(multicast));
-    if(ret == -1){ printf("set_mult3: IPPROTO_IP, IP_ADD_MEMBERSHIP");}
+    if(ret == -1)
+    { 
+        int err = errno;
+		fprintf(stderr,"[CLIENT] set_mult: IPPROTO_IP, IP_ADD_MEMBERSHIP, errno=%i, str - %s\n", err, strerror(err));
+		return MulticastCode::MEMBERSHIP_ADD_ERROR;
+    }
+    return NetworkCode::SUCCESS;
 }
 
-/**
- * @brief Create thread that receives std::map<int,User> from multicast
- */
+/// @brief Create thread that receives std::map<int, User> from multicast
 void Client::grabMapFromMulticastThread()
 {
     map_receiver_tread = std::thread([&](){
         while(1)
         {
-            usleep(MICROSEC_WAIT);
+            std::this_thread::sleep_for(NOTIFYING_DELAY);
             field_drawer.setMap(recvMap());
             if(move_char == CommandKeys::EXIT)
             { 
@@ -199,11 +211,11 @@ std::map<int, User> Client::recvMap()
 }
 
 /**
- * @brief Check if char belong to CommandKeys enum.
+ * @brief Check if char belong to ::CommandKeys enum.
  * 
  * Converting a single char to lowercase and comparing.
  * @param[in] to_verify char that need test 
- * @return true if belong to CommandKeys enum.
+ * @return true if belong to ::CommandKeys enum.
  */
 bool Client::isMoveCorrectChar(char to_verify)
 {
@@ -219,7 +231,7 @@ bool Client::isMoveCorrectChar(char to_verify)
 /**
  * @brief Send char to remote server 
  * 
- * @param[in] move_direction one of CommandKeys enum char
+ * @param[in] move_direction one of ::CommandKeys enum char
  */
 void Client::sendMoveDirection(char move_direction)
 {

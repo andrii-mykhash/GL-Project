@@ -2,7 +2,7 @@
 #define GL_CLIENT_H
 
 #include "user.hpp"
-#include "both_data.h"
+#include "commondefs.h"
 #include "field_drawer.h"
 
 #include <string>
@@ -23,7 +23,7 @@ public:
     void sendMoveDirection(char move_direction);
 
 private:
-    void setupMulticast();
+    int setupMulticast();
 
     int connectToServer(std::string ip);
 

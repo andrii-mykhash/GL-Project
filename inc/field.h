@@ -3,7 +3,7 @@
 
 #include "dot.h"
 #include "user.hpp"
-#include "both_data.h"
+#include "commondefs.h"
 
 #include <map>
 #include <string>
@@ -24,7 +24,12 @@ public:
     
     int getUser(int id, User& to_return);
     
-    std::map<int, User> getMap();
+        
+    /// @brief Get map with users data.
+    inline std::map<int, User> Field::getMap()
+    {
+        return users_info;
+    }
 
 private:
     static int id_counter;

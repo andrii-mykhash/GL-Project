@@ -1,13 +1,4 @@
-/**
- * @file client_main.cpp
- * @author Andrii (you@domain.com)
- * @brief 
- * @version 0.1
- * @date 2022-04-08
- * 
- * @copyright Copyright Andrii(c) 2022
- * 
- */
+/// @file client_main.cpp
 #include "client/client.h"
 
 #include <iostream>
@@ -31,15 +22,15 @@ int main()
         ret_code = client.init(ip_str);
         switch (ret_code)
         {
-        case NetworkError::CANNOT_CONNECT :
+        case NetworkCode::CANNOT_CONNECT :
             std::cout << "Cannot connect to the server.\nexiting...\n";
             return ret_code;
         
-         case NetworkError::INVALID_ADDRESS :
+         case NetworkCode::INVALID_ADDRESS :
             std::cout << "Invalid address\n";
             continue;
         
-         case NetworkError::SOCKET_NOT_CREATED :
+         case NetworkCode::SOCKET_NOT_CREATED :
             std::cout << "Cannot create socket.\nexiting...\n";
             return ret_code;
         
@@ -47,10 +38,8 @@ int main()
             is_correct_addres = true;
             break;
         }
-        
     }
 
-// CONTINUE_WORK:
     unsigned char move_offset = '\0';
     while (1)
     {

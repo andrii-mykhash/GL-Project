@@ -1,13 +1,4 @@
-/**
- * @file field.cpp
- * @author Andrii  (you@domain.com)
- * @brief Field Class realization
- * @version 0.1
- * @date 2022-04-04
- * 
- * @copyright Copyright Andrii (c) 2022
- * 
- */
+/// @file field.cpp
 #include "field.h"
 
 #include <unistd.h>
@@ -113,12 +104,4 @@ void Field::remove(User to_remove)
 {
     std::lock_guard<std::mutex> lock(map_mutex);
     users_info.erase(to_remove.uid);
-}
-
-/**
- * @brief Get map with users data.
- */
-std::map<int, User> Field::getMap()
-{
-    return users_info;
 }

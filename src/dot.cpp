@@ -1,12 +1,4 @@
-/**
- * @file dot.cpp
- * @author Andrii (you@domain.com)
- * @brief 
- * @version 0.1
- * @date 2022-04-08
- * 
- * @copyright Copyright Andrii (c) 2022
- */
+///@file dot.cpp
 #include "dot.h"
 
 /**

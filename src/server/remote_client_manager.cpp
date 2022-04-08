@@ -1,13 +1,4 @@
-/**
- * @file remote_client_manager.cpp
- * @author Andrii (you@domain.com)
- * @brief 
- * @version 0.1
- * @date 2022-04-04
- * 
- * @copyright Copyright Andrii (c) 2022
- * 
- */
+/// @file remote_client_manager.cpp
 #include "server/remote_client_manager.h"
 
 #include <unistd.h>
@@ -68,7 +59,7 @@ int RemoteClientManager::addNewUserToField(sockaddr_in &remote_sock_addr)
 /**
  * @brief Receive char from client
  * 
- * @return char that belong to CommandKeys enum.
+ * @return char that belong to ::CommandKeys enum.
  */
 char RemoteClientManager::recvMoveDirection()
 {
@@ -96,7 +87,7 @@ char RemoteClientManager::recvMoveDirection()
 /**
  * @brief Move user at one position: left, right, up or down.
  * 
- * @param[in] move_direction char with move direction that belong to CommandKeys enum
+ * @param[in] move_direction char with move direction that belong to ::CommandKeys enum
  * @param[in out] to_move reference to User struct
  */
 void RemoteClientManager::move(char move_direction, User &to_move)
@@ -133,10 +124,7 @@ void RemoteClientManager::move(char move_direction, User &to_move)
     }
 }
 
-/**
- * @brief Start thread worker
- * 
- */
+/// @brief Start thread worker
 void RemoteClientManager::run()
 {
     manage_connection_thread = std::thread([&]()
@@ -145,10 +133,7 @@ void RemoteClientManager::run()
     });
 }
 
-/**
- * @brief Stop thread worker
- * 
- */
+/// @brief Stop thread worker
 void RemoteClientManager::stop()
 {
     if(manage_connection_thread.joinable())
@@ -157,10 +142,7 @@ void RemoteClientManager::stop()
     }
 }
 
-/**
- * @brief Manage client connection 
- * 
- */
+/// @brief Manage client connection 
 void RemoteClientManager::manageConnection()
 {
     User current_user;

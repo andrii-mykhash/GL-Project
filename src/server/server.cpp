@@ -1,14 +1,4 @@
-/**
- * @file server.cpp
- * @author Andrii (you@domain.com)
- * @brief 
- * @version 0.1
- * @date 2022-04-04
- * 
- * @copyright Copyright MIT (c) 2022
- * 
- */
-
+/// @file server.cpp
 #include "server/server.h"
 #include "json_wrapper.hpp"
 
@@ -23,7 +13,7 @@
  * @brief Initialize servet TCP and UDP sockets, start multicasting map data.
  * 
  * @param[in] ttl_number
- * @return 0 in success
+ * @return 0 in success, one of ::NetworkCode or ::MulticastCode enum code in error
  */
 int Server::init(char ttl_number)
 {
@@ -34,7 +24,10 @@ int Server::init(char ttl_number)
 		return ret;
 	}
 
-	initMulticast(ttl_number);
+	if((ret = initMulticast(ttl_number)) < 0)
+	{
+		return ret;
+	}
 	createNotifyMapThread();
 	return 0;
 }
@@ -42,14 +35,14 @@ int Server::init(char ttl_number)
 /**
  * @brief Create TCP listen socket.
  * 
- * @return 0 in success, -n..-1 in error
+ * @return 0 in success, one of ::NetworkCode enum code in error
  */
 int Server::initServer()
 {
 	listen_sock = socket(AF_INET, SOCK_STREAM, 0); 
 	if (listen_sock < 0)
 	{
-		return NetworkError::SOCKET_NOT_CREATED;
+		return NetworkCode::SOCKET_NOT_CREATED;
 	}
 
 	sockaddr_in listen_sock_addr;
@@ -61,21 +54,21 @@ int Server::initServer()
 	if (bind(listen_sock, (sockaddr *)&listen_sock_addr,
 			 sizeof(listen_sock_addr)) == -1)
 	{
-		return NetworkError::BIND_ERROR;
+		return NetworkCode::BIND_ERROR;
 	}
 
 	if (listen(listen_sock, 1) < 0)
 	{
-		return NetworkError::LISTEN_ERROR;
+		return NetworkCode::LISTEN_ERROR;
 	}
-	return 0;
+	return NetworkCode::SUCCESS;
 }
 
 /**
  * @brief Create UDP multicast socket. 
  * 
  * @param[in] ttl_number
- * @return 0 in success
+ * @return 0 in success, one of ::MulticastCode enum code in error
  */
 int Server::initMulticast(char ttl_number)
 {
@@ -93,23 +86,24 @@ int Server::initMulticast(char ttl_number)
 	if(setsockopt(multicast_sock, IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof(loop)) != 0)
 	{
 		int err = errno;
-		fprintf(stderr,"multicast_init: LOOP, errno=%i, str - %s\n", err, strerror(err));
-		return -1;
+		fprintf(stderr,"[SERVER] multicast_init1: LOOP, errno=%i, str - %s\n", err, strerror(err));
+		return MulticastCode::LOOP_SETUP_ERROR;
 	}
 	if(setsockopt(multicast_sock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl_number, sizeof(ttl_number)) != 0)
 	{
 		int err = errno;
-		fprintf(stderr,"multicast_init: TTL, errno=%i, str - %s\n", err, strerror(err));
-		return -1;
+		fprintf(stderr,"[SERVER] multicast_init2: TTL, errno=%i, str - %s\n", err, strerror(err));
+		return MulticastCode::TTL_SETUP_ERROR;
 	}
     
 	if(setsockopt(multicast_sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, &multicast, sizeof(multicast)) != 0)
 	{
 		int err = errno;
-		fprintf(stderr,"multicast_init: MEMBERSHIP, errno=%i, str - %s\n", err, strerror(err));
-		return -1;
+		fprintf(stderr,"[SERVER] multicast_init3: MEMBERSHIP, errno=%i, str - %s\n", err, strerror(err));
+		return MulticastCode::MEMBERSHIP_ADD_ERROR;
 	}
-	return 0;
+
+	return NetworkCode::SUCCESS;
 }
 
 /**
@@ -138,7 +132,7 @@ Server::~Server()
  * 
  * Try to accept new user during 5 seconds.
  * @param[in out] remote_sock_addr struct to store IP:PORT 
- * @return file descriptor in success, -1 if time out, -errno if accept error
+ * @return file descriptor in success; ::NetworkCode::TIME_OUT enum code or -errno if accept error
  */
 int Server::acceptConnection(sockaddr_in &remote_sock_addr)
 {
@@ -163,13 +157,10 @@ int Server::acceptConnection(sockaddr_in &remote_sock_addr)
 		printf("new connection: fd=%d\n", remote_sock);
 		return remote_sock;
 	}
-	return -1;
+	return NetworkCode::TIME_OUT;
 }
 
-/**
- * @brief Send json with map data.
- * 
- */
+/// @brief Send json with map data.
 void Server::sendMap()
 {
 	int ret = 0;
@@ -195,17 +186,14 @@ void Server::sendMap()
 	}
 }
 
-/**
- * @brief Create thread to multicast data.
- * 
- */
+/// @brief Create thread to multicast data.
 void Server::createNotifyMapThread()
 {
 	notify_map_thread = std::thread([&]()
 	{
 		while (can_notify_map)
 		{	
-            usleep(MICROSEC_WAIT);
+            std::this_thread::sleep_for(NOTIFYING_DELAY);
 			sendMap();
 		}
 	});

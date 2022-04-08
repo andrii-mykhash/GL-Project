@@ -1,15 +1,6 @@
-/**
- * @file field_drawer.cpp
- * @author Andrii (you@domain.com)
- * @brief 
- * @version 0.1
- * @date 2022-04-04
- * 
- * @copyright Copyright Andrii (c) 2022
- * 
- */
+/// @file field_drawer.cpp
 #include "client/field_drawer.h"
-#include "both_data.h"
+#include "commondefs.h"
 
 /**
  *  @brief Destroy the FieldDrawer object.
@@ -54,9 +45,7 @@ void FieldDrawer::openTTYFile()
     }
 }
 
-/**
- * @brief Draw UI - users, field and controlls button.
- */
+/// @brief Draw UI: users, field and controlls button.
 void FieldDrawer::draw()
 {
     *tty << FieldDrawer::CLEAR_TERMINAL_VALUE;
@@ -66,9 +55,7 @@ void FieldDrawer::draw()
     tty->flush();
 }
 
-/**
- * @brief Print info about all users.
- */
+/// @brief Print info about all users.
 void FieldDrawer::printAllUsers()
 {
     int i = 1;
@@ -87,9 +74,7 @@ void FieldDrawer::printAllUsers()
     *tty << std::endl;
 }
 
-/**
- * @brief Draw field grid [FIELD_WIDTH][FIELD_HEIGHT] dimmention.
- */
+/// @brief Draw field grid [FIELD_WIDTH][FIELD_HEIGHT] dimmention.
 void FieldDrawer::drawField()
 {
     char paint[FIELD_WIDTH][FIELD_HEIGHT] = {'\0'};
