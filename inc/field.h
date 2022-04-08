@@ -26,7 +26,7 @@ public:
     
         
     /// @brief Get map with users data.
-    inline std::map<int, User> Field::getMap()
+    inline std::map<int, User> getMap()
     {
         return users_info;
     }

@@ -4,7 +4,7 @@
 /**
  * @brief Dots comparison.
  * 
- * E.g.: [Dot(32,5) <=> Dot(8, 76)] --> [int(3205) <=> int(876)].
+ * E.g.: [Dot(32, 5) <=> Dot(8, 76)] --> [int(3205) <=> int(876)].
  */
 std::weak_ordering Dot::operator<=>(const Dot &to_verify) const
 {
@@ -14,4 +14,20 @@ std::weak_ordering Dot::operator<=>(const Dot &to_verify) const
   rhs_temp = to_verify.x * shift_to_left + to_verify.y;
 
   return lhs_temp <=> rhs_temp;
+}
+
+
+/**
+ * @brief Dots comparison.
+ * 
+ * E.g.: [Dot(32, 5) == Dot(32, 5)] --> [int(3205) <=> int(3205)].
+ */
+bool Dot::operator== (const Dot &to_compare) const
+{
+  int lhs_temp, rhs_temp;
+  const int shift_to_left = 100;
+  lhs_temp = this->x * shift_to_left + this->y;
+  rhs_temp = to_compare.x * shift_to_left + to_compare.y;
+
+  return lhs_temp == rhs_temp;
 }

@@ -20,17 +20,17 @@ int Field::createUser(std::string ip_address)
     std::uniform_int_distribution<int> y(0, FIELD_HEIGHT);
     User temp_user;
     temp_user.ip = ip_address;
-    bool isnt_done = true;
+    bool is_done = false;
     std::lock_guard<std::mutex> lock(map_mutex);
     temp_user.uid = Field::id_counter;
     Field::id_counter++;
-    while (isnt_done)
+    while (!is_done)
     {
         temp_user.coords.x = x(e1);
         temp_user.coords.y = y(e1);
         if (!hasCollision(temp_user))
         {
-            isnt_done = false;
+            is_done = true;
         }
     }
 
@@ -49,6 +49,7 @@ bool Field::hasCollision(User& to_verify) const
     std::lock_guard<std::mutex> lock1(collision_mutex);
     for (auto it = users_info.begin(); it != users_info.end(); it++)
     {
+        /// If \"to_verify\" Dot and one of std::map \"users_info\" Dot have same coordinates, but different ID -> collision  
         if ((it->second.coords <=> to_verify.coords) == 0
              && to_verify.uid != it->first)
         {
