@@ -5,7 +5,7 @@
  * @version 0.1
  * @date 2022-04-04
  * 
- * @copyright Copyright MIT (c) 2022
+ * @copyright Copyright Andrii (c) 2022
  * 
  */
 #include "client/client.h"
@@ -95,7 +95,9 @@ Client::~Client()
     {
         err = errno;
         if(err != NON_SOCK_OPERATION)
-        fprintf(stderr,"\nserver_sock: socket shutdown failed: errno=%i, str=\'%s\'\n",err, strerror(err));
+        {
+            fprintf(stderr,"\nserver_sock: socket shutdown failed: errno=%i, str=\'%s\'\n",err, strerror(err));
+        }
     }
     if(err != NON_SOCK_OPERATION)
     {

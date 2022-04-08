@@ -5,7 +5,7 @@
  * @version 0.1
  * @date 2022-04-04
  * 
- * @copyright Copyright MIT (c) 2022
+ * @copyright Copyright Andrii (c) 2022
  * 
  */
 #include "field.h"

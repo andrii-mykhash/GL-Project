@@ -35,7 +35,7 @@ int Server::init(char ttl_number)
 	}
 
 	initMulticast(ttl_number);
-	notifyMap();
+	createNotifyMapThread();
 	return 0;
 }
 
@@ -199,7 +199,7 @@ void Server::sendMap()
  * @brief Create thread to multicast data.
  * 
  */
-void Server::notifyMap()
+void Server::createNotifyMapThread()
 {
 	notify_map_thread = std::thread([&]()
 	{

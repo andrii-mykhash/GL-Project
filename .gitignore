@@ -2,6 +2,5 @@ build/
 .vscode/
 log.cpp
 tty_main*
-tmp.cpp
-tmp
+tmp*
 doc/doxygen

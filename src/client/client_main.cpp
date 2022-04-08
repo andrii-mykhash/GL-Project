@@ -1,3 +1,13 @@
+/**
+ * @file client_main.cpp
+ * @author Andrii (you@domain.com)
+ * @brief 
+ * @version 0.1
+ * @date 2022-04-08
+ * 
+ * @copyright Copyright Andrii(c) 2022
+ * 
+ */
 #include "client/client.h"
 
 #include <iostream>
@@ -34,13 +44,13 @@ int main()
             return ret_code;
         
         case 0:
-            goto CONTINUE_WORK;
+            is_correct_addres = true;
             break;
         }
         
     }
 
-CONTINUE_WORK:
+// CONTINUE_WORK:
     unsigned char move_offset = '\0';
     while (1)
     {

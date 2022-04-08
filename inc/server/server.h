@@ -22,7 +22,7 @@ public:
 private:
 	void sendMap();
 
-	void notifyMap();
+	void createNotifyMapThread();
 
 	int initServer();
 	
