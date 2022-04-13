@@ -1,5 +1,5 @@
 /// @file server_main.cpp
-#include "../inc/server/server.h"
+#include "server/server.h"
 
 #include <cstring>
 #include <iostream>

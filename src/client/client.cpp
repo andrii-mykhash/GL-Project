@@ -14,6 +14,7 @@
  * get id and create map grabber thread. 
  * 
  * @param[in] ip remote address of server
+ * @param[in] test_flag flag use for unit tests
  * @return 0 in success, one of ::NetworkCode or ::MulticastCode enum code in error
  */
 int Client::init(std::string ip, bool test_flag)
@@ -98,7 +99,7 @@ Client::~Client()
 
 /**
  * @brief Create UDP multicast socket.
- * @return 0 in success, ::NetworkCode::BIND_ERROR or one of ::MulticastCode enum code in error
+ * @return 0 in success, NetworkCode::BIND_ERROR or one of ::MulticastCode enum code in error
  */
 int Client::setupMulticast()
 {

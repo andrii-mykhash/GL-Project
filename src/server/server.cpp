@@ -132,7 +132,7 @@ Server::~Server()
  * 
  * Try to accept new user during 5 seconds.
  * @param[in out] remote_sock_addr struct to store IP:PORT 
- * @return file descriptor in success; ::NetworkCode::TIME_OUT enum code or -errno if accept error
+ * @return file descriptor in success; NetworkCode::TIME_OUT enum code or -errno if accept error
  */
 int Server::acceptConnection(sockaddr_in &remote_sock_addr)
 {
