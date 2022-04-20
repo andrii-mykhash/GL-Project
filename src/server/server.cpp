@@ -121,10 +121,22 @@ Server::~Server()
 
 	if (shutdown(listen_sock, SHUT_RDWR) != 0)
 	{
-		fprintf(stderr,"shutdow socket error, sock_fd=%d\n", listen_sock);
+		int err = errno;
+		fprintf(stderr,"shutdow socket error, sock_fd=%d\n, errno=%i, \
+			strerror - %s\n", listen_sock, err, strerror(err));
 	}
-	close(listen_sock);
-	close(multicast_sock);	
+	if(close(listen_sock) != 0 )
+	{
+		int err = errno;
+		fprintf(stderr,"close fd error, listen_fd=%d, errno=%i, \
+			strerror - %s\n", listen_sock, err, strerror(err));
+	}
+	if(close(multicast_sock) != 0 )
+	{
+		int err = errno;
+		fprintf(stderr,"close fd error, multicast_fd=%d, errno=%i, \
+			strerror - %s\n", multicast_sock, err, strerror(err));
+	}
 }
 
 /**

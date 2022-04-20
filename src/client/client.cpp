@@ -81,7 +81,12 @@ Client::~Client()
     if(map_receiver_tread.joinable())
     {
         map_receiver_tread.join();
-        close(multicast_sock);
+        if(close(multicast_sock) != 0 )
+        {
+            int err = errno;
+            fprintf(stderr,"close fd error, multicast_fd=%d, errno=%i, \
+                strerror - %s\n", multicast_sock, err, strerror(err));
+        }
     }
     if (shutdown(server_sock, SHUT_RDWR) != 0)
     {
@@ -93,7 +98,12 @@ Client::~Client()
     }
     if(err != NON_SOCK_OPERATION)
     {
-        close(server_sock);
+        if(close(server_sock) != 0 )
+        {
+            int err = errno;
+            fprintf(stderr,"close fd error, multicast_fd=%d, errno=%i, \
+                strerror - %s\n", server_sock, err, strerror(err));
+        }
     }
 }
 

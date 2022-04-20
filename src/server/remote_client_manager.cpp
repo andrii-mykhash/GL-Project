@@ -32,7 +32,12 @@ void RemoteClientManager::closeConnection(int sock)
         fprintf(stderr,"error closing socket: strerror=%d: \
             %s thread_id=%d\n", error, strerror(error), thread_id);
     }
-    close(sock);
+    if(close(sock) != 0 )
+	{
+		int err = errno;
+		fprintf(stderr,"close fd error, remote_sock_fd=%d, errno=%i, \
+			strerror - %s\n", sock, err, strerror(err));
+	}
     printf("closed connection: sock_fd=%d \n", sock);
 }
 
